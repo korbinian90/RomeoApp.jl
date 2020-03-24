@@ -1,0 +1,13 @@
+name = "RomeoApp"
+uuid = "6ec04266-ba88-41a1-94ab-4aa3de757d7e"
+authors = ["Korbinian Eckstein", "High Field MR Centre", "Medical University Vienna"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
