@@ -1,6 +1,6 @@
 function getargs(args)
     if isempty(args) args = ["--help"] end
-    s = ArgParseSettings()
+    s = ArgParseSettings(exc_handler=exception_handler)
     @add_arg_table! s begin
         "phase"
             help = "The phase image used for unwrapping"
@@ -41,6 +41,16 @@ function getargs(args)
             default = Inf
     end
     return parse_args(args, s)
+end
+
+function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
+    if err == ArgParseError("too many arguments")
+        println(stderr, """Wrong argument formatting!
+        Maybe there are unsupported spaces in the array syntax.
+        [1, 2, 3] is wrong; [1,2,3] is correct
+        """)
+    end
+    ArgParse.default_handler(settings, err, err_code)
 end
 
 function getechoes(settings, neco)
