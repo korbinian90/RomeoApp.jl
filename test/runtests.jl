@@ -7,16 +7,33 @@ phasefile = joinpath("data", "small", "Phase.nii")
 magfile = joinpath("data", "small", "Mag.nii")
 
 function test_romeo(args)
-    file = tempname()
-    args = [args..., "-o", file]
-    unwrapping_main(args)
-    @test isfile(joinpath(file, "unwrapped.nii"))
+    folder = tempname()
+    args = [args..., "-o", folder]
+    @test unwrapping_main(args) == 0
+    @test isfile(joinpath(folder, "unwrapped.nii"))
 end
 
-args = [phasefile, "-B", "-t", "[2,4,6]"]
-test_romeo(args)
+configurations = [
+    [phasefile],
+    [phasefile, "-m", magfile],
+    [phasefile, "-N"],
+    [phasefile, "-i"],
+    [phasefile, "-e", "1:2"],
+    [phasefile, "-e", "[1,3]"],
+    #[phasefile, "-e", "[1, 3]"],
+    [phasefile, "-k", "nomask"],
+    [phasefile, "-t", "[2,4,6]"],
+    [phasefile, "-t", "2:2:6"],
+    [phasefile, "-t", "[2.1,4.2,6.3]"],
+    [phasefile, "-w", "romeo"],
+    [phasefile, "-w", "bestpath"],
+    [phasefile, "-T", "4"],
+    #[phasefile, "-t", "[2, 4, 6]"]
+    [phasefile, "-B", "-t", "[2,4,6]"],
+]
 
-args = [phasefile, "-m", magfile]
-test_romeo(args)
+for args in configurations
+    test_romeo(args)
+end
 
 end
