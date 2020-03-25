@@ -20,7 +20,7 @@ configurations = [
     [phasefile, "-i"],
     [phasefile, "-e", "1:2"],
     [phasefile, "-e", "[1,3]"],
-    #[phasefile, "-e", "[1, 3]"],
+    [phasefile, "-e", "[1, 3]"], # fine here but not in command line
     [phasefile, "-k", "nomask"],
     [phasefile, "-t", "[2,4,6]"],
     [phasefile, "-t", "2:2:6"],
@@ -28,12 +28,13 @@ configurations = [
     [phasefile, "-w", "romeo"],
     [phasefile, "-w", "bestpath"],
     [phasefile, "-T", "4"],
-    #[phasefile, "-t", "[2, 4, 6]"]
     [phasefile, "-B", "-t", "[2,4,6]"],
+    [phasefile, "-B", "-t", "[2, 4, 6]"],
 ]
 
 for args in configurations
     test_romeo(args)
 end
+
 
 end
