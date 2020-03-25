@@ -37,6 +37,7 @@ function getargs(args)
             help = """<maximum number of wraps>
                     Threshold the unwrapped phase to the maximum number of wraps
                     Sets exceeding values to 0"""
+            arg_type = Float64
             default = Inf
     end
     return parse_args(args, s)
