@@ -87,7 +87,6 @@ function unwrapping_main(args)
 
         savenii(B0, "B0", writedir, hdr)
     end
-
-    @show writedir
+    
     return 0
 end
