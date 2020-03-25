@@ -11,9 +11,10 @@ function getargs(args)
             default = "unwrapped.nii"
         "--echo-times", "-t"
             help = """The relative echo times required for temporal unwrapping (default is 1:n)
-                    specified in array or range syntax (eg. [1.5,3.0] or 2:5)"""
+                    specified in array or range syntax (eg. [1.5,3.0] or 2:5)
+                    Warning: No spaces allowed!! ([1, 2, 3] is invalid!)"""
         "--mask", "-k"
-            help = "<mask_file> | nomask | robustmask"
+            help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
         "--individual-unwrapping", "-i"
             help = """Unwraps the echoes individually (not temporal)
@@ -23,7 +24,7 @@ function getargs(args)
             help = "Unwrap only the specified echoes"
             default = ":"
         "--weights", "-w"
-            help = "<4d-weights-file> | romeo | bestpath"
+            help = "romeo | bestpath | <4d-weights-file> "
             default = "romeo"
         "--compute-B0", "-B"
             help = "EXPERIMENTAL! Calculate combined B0 map in [rad/s]"
@@ -31,11 +32,11 @@ function getargs(args)
         "--no-mmap", "-N"
             help = """Deactivate memory mapping.
                     Memory mapping might cause problems on network storage"""
-            action = :store_false
+            action = :store_true
         "--threshold", "-T"
             help = """<maximum number of wraps>
                     Threshold the unwrapped phase to the maximum number of wraps
-                    Sets values to 0"""
+                    Sets exceeding values to 0"""
             default = Inf
     end
     return parse_args(args, s)
