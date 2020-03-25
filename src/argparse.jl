@@ -39,6 +39,9 @@ function getargs(args)
                     Sets exceeding values to 0"""
             arg_type = Float64
             default = Inf
+        "--verbose", "-v"
+            help = "verbose output messages"
+            action = :store_true
     end
     return parse_args(args, s)
 end
@@ -65,7 +68,7 @@ end
 
 function getTEs(settings, neco, echoes)
     if settings["echo-times"] != nothing
-        @show TEs = eval(Meta.parse(settings["echo-times"]))
+        TEs = eval(Meta.parse(settings["echo-times"]))
         if length(TEs) == neco
             TEs = TEs[echoes]
         end

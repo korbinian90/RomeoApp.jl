@@ -15,6 +15,7 @@ end
 
 configurations = [
     [phasefile],
+    [phasefile, "-v"],
     [phasefile, "-m", magfile],
     [phasefile, "-N"],
     [phasefile, "-i"],

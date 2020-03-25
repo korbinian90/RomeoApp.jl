@@ -61,10 +61,13 @@ function unwrapping_main(args)
     end
 
     if settings["individual-unwrapping"] && length(echoes) > 1
+        settings["verbose"] && println("perform individual unwrapping...")
         unwrap_individual!(phase; keyargs...)
     else
+        settings["verbose"] && println("perform unwrapping...")
         unwrap!(phase; keyargs...)
     end
+    settings["verbose"] && println("unwrapping finished!")
 
     if settings["threshold"] != Inf
         max = settings["threshold"] * 2π
@@ -87,6 +90,6 @@ function unwrapping_main(args)
 
         savenii(B0, "B0", writedir, hdr)
     end
-    
+
     return 0
 end
