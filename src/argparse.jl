@@ -47,6 +47,11 @@ function getargs(args)
                     The median of phase values (inside mask if given)
                     is used to calculate the correction term"""
             action = :store_true
+        "--maximum-regions", "-r"
+            help = """Experimental!
+                    """
+            arg_type = Int
+            default = 50
     end
     return parse_args(args, s)
 end

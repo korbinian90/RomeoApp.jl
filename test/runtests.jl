@@ -17,6 +17,8 @@ configurations = [
     [phasefile],
     [phasefile, "-v"],
     [phasefile, "-g"],
+    [phasefile, "-r", "1"],
+    [phasefile, "-r", "20"],
     [phasefile, "-m", magfile],
     [phasefile, "-N"],
     [phasefile, "-i"],
