@@ -42,6 +42,11 @@ function getargs(args)
         "--verbose", "-v"
             help = "verbose output messages"
             action = :store_true
+        "--correct-global", "-g"
+            help = """phase is corrected to remove global n2π phase offset.
+                    The median of phase values (inside mask if given)
+                    is used to calculate the correction term"""
+            action = :store_true
     end
     return parse_args(args, s)
 end

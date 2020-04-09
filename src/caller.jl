@@ -60,6 +60,10 @@ function unwrapping_main(args)
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(keyargs[:TEs])) TEs were specified!")
     end
 
+    if settings["correct-global"]
+        keyargs[:correctglobal] = true
+    end
+
     if settings["individual-unwrapping"] && length(echoes) > 1
         settings["verbose"] && println("perform individual unwrapping...")
         unwrap_individual!(phase; keyargs...)
