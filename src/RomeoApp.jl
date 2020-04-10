@@ -1,10 +1,13 @@
 module RomeoApp
 
 using ArgParse
-using MriResearchTools
+using NIfTI
+using ROMEO
+using Statistics
 
 include("argparse.jl")
 include("caller.jl")
+include("MriResearchTools_functions.jl")
 
 function julia_main()::Cint
     try
