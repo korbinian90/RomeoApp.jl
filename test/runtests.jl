@@ -3,8 +3,10 @@ using Test
 
 @testset "ROMEO function tests" begin
 
-phasefile = joinpath("data", "small", "Phase.nii")
-magfile = joinpath("data", "small", "Mag.nii")
+p = joinpath("data", "small")
+phasefile = joinpath(p, "Phase.nii")
+phasefile_nan = joinpath(p, "phase_with_nan.nii")
+magfile = joinpath(p, "Mag.nii")
 
 function test_romeo(args)
     folder = tempname()
@@ -15,6 +17,7 @@ end
 
 configurations = [
     [phasefile],
+    [phasefile_nan],
     [phasefile, "-v"],
     [phasefile, "-g"],
     [phasefile, "-m", magfile],
@@ -37,6 +40,5 @@ configurations = [
 for args in configurations
     test_romeo(args)
 end
-
 
 end
