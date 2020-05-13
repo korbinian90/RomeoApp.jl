@@ -49,7 +49,7 @@ save the image at the path
 Warning: MRIcro can only open images with types Int32, Int64, Float32, Float64
 """
 function savenii(image::AbstractArray, filepath::AbstractString; header=nothing)
-    vol = NIVolume([h for h in [header] if h != nothing]..., image)
+    vol = NIVolume([h for h in [header] if h != nothing]..., Float32.(image))
     niwrite(filepath, vol)
 end
 
