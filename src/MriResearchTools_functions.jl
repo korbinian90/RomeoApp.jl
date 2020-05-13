@@ -62,10 +62,10 @@ function estimatenoise(weight)
     lowestmean = Inf
     sigma = 0
     for I in corners
-        m = mean(weight[I...])
+        m = mean(filter(isfinite, weight[I...]))
         if m < lowestmean
             lowestmean = m
-            sigma = std(weight[I...])
+            sigma = std(filter(isfinite, weight[I...]))
         end
     end
     return lowestmean, sigma
