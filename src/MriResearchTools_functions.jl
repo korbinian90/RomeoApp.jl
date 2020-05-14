@@ -53,29 +53,20 @@ function savenii(image::AbstractArray, filepath::AbstractString; header=nothing)
     niwrite(filepath, vol)
 end
 
-function estimatenoise(weight)
-    # find corner with lowest intensity
-    d = size(weight)
-    n = min.(10, d .÷ 3) # take 10 voxel but maximum a third
-    getrange(num, len) = [1:len, (len-num+1):len] # first and last voxels
-    corners = Iterators.product(getrange.(n, d)...)
-    lowestmean = Inf
-    sigma = 0
-    for I in corners
-        m = mean(filter(isfinite, weight[I...]))
-        if m < lowestmean
-            lowestmean = m
-            sigma = std(filter(isfinite, weight[I...]))
-        end
-    end
-    return lowestmean, sigma
-end
-
 function robustmask!(image; maskedvalue=if eltype(image) <: AbstractFloat NaN else 0 end)
     image[.!robustmask(image)] .= maskedvalue
     image
 end
+
 function robustmask(weight)
-    μ, σ = estimatenoise(weight)
-    return weight .> μ + 3σ
+    notnan = isfinite.(weight)
+    mean1 = mean(weight[notnan])
+    noisemask = weight .< mean1
+    noisemean = mean(weight[noisemask])
+    if !isfinite(noisemean) return ones(size(weight)) end
+
+    signalmean = mean(weight[.!noisemask .& notnan])
+    noise_σ = std(weight[noisemask])
+
+    mask = weight .> noisemean + noise_σ
 end
