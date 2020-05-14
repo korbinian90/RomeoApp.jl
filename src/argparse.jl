@@ -11,14 +11,14 @@ function getargs(args)
             default = "unwrapped.nii"
         "--echo-times", "-t"
             help = """The relative echo times required for temporal unwrapping (default is 1:n)
-                    specified in array or range syntax (eg. [1.5,3.0] or 2:5)
+                    specified in array or range syntax (eg. [1.5,3.0] or 3.5:3.5:14)
                     Warning: No spaces allowed!! ([1, 2, 3] is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
         "--individual-unwrapping", "-i"
             help = """Unwraps the echoes individually (not temporal)
-                    Temporal unwrapping only works with ASPIRE"""
+                    Temporal unwrapping only works when phase offset is removed (ASPIRE)"""
             action = :store_true
         "--unwrap-echoes", "-e"
             help = "Unwrap only the specified echoes"
