@@ -8,6 +8,10 @@ function unwrapping_main(args)
         writedir = dirname(writedir)
     end
 
+    if settings["magnitude"] == nothing && settings["weights"] == "romeo3"
+        settings["weights"] = "romeo"
+    end
+
     mkpath(writedir)
     saveconfiguration(writedir, settings, args)
 
