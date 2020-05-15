@@ -1,6 +1,6 @@
 function getargs(args)
     if isempty(args) args = ["--help"] end
-    s = ArgParseSettings(exc_handler=exception_handler)
+    s = ArgParseSettings(exc_handler=exception_handler, add_version=true)
     @add_arg_table! s begin
         "phase"
             help = "The phase image used for unwrapping"
@@ -10,8 +10,10 @@ function getargs(args)
             help = "The output path and filename"
             default = "unwrapped.nii"
         "--echo-times", "-t"
-            help = """The relative echo times required for temporal unwrapping (default is 1:n)
-                    specified in array or range syntax (eg. [1.5,3.0] or 3.5:3.5:14)
+            help = """The relative echo times required for temporal unwrapping
+                    (default is 1:n) specified in array or range syntax
+                    (eg. [1.5,3.0] or 3.5:3.5:14) or for multiple volumes with
+                    the same echo time: ones(<nr_of_time_points>)
                     Warning: No spaces allowed!! ([1, 2, 3] is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
@@ -43,9 +45,15 @@ function getargs(args)
             help = "verbose output messages"
             action = :store_true
         "--correct-global", "-g"
-            help = """phase is corrected to remove global n2π phase offset.
+            help = """Phase is corrected to remove global n2π phase offset.
                     The median of phase values (inside mask if given)
                     is used to calculate the correction term"""
+            action = :store_true
+        "--write-quality", "-q"
+            help = """Write the quality of the voxels used for unwrapping"""
+            action = :store_true
+        "--write-quality-all", "-Q"
+            help = """Write the quality map for each dimension"""
             action = :store_true
     end
     return parse_args(args, s)

@@ -53,11 +53,6 @@ function unwrapping_main(args)
     if length(echoes) > 1
         keyargs[:TEs] = getTEs(settings, neco, echoes)
     end
-    if isfile(settings["weights"]) && splitext(settings["weights"])[2] != ""
-        keyargs[:weights] = UInt8.(niread(settings["weights"]))
-    else
-        keyargs[:weights] = Symbol(settings["weights"])
-    end
 
     ## Error messages
     if 1 < length(echoes) && length(echoes) != length(keyargs[:TEs])
@@ -68,12 +63,24 @@ function unwrapping_main(args)
         keyargs[:correctglobal] = true
     end
 
+    weights = if isfile(settings["weights"]) && splitext(settings["weights"])[2] != ""
+        UInt8.(niread(settings["weights"]))
+    else
+        Symbol(settings["weights"])
+    end
+
     if settings["individual-unwrapping"] && length(echoes) > 1
         settings["verbose"] && println("perform individual unwrapping...")
-        unwrap_individual!(phase; keyargs...)
+        unwrap_individual!(phase; weights=weights, keyargs...)
     else
         settings["verbose"] && println("perform unwrapping...")
-        unwrap!(phase; keyargs...)
+        weights = ROMEO.calculateweights(phase; weights=weights, keyargs...)
+        if settings["write-quality"]
+            savenii(dropdims(sum(weights; dims=1); dims=1), "quality", writedir, hdr)
+        elseif settings["write-quality-all"]
+            savenii(weights, "quality", writedir, hdr)
+        end
+        unwrap!(phase; weights=weights, keyargs...)
     end
     settings["verbose"] && println("unwrapping finished!")
 
@@ -100,4 +107,14 @@ function unwrapping_main(args)
     end
 
     return 0
+end
+
+function ROMEO.calculateweights(phase::AbstractArray{T,4}; TEs, template=2, p2ref=1, keyargs...) where T
+    args = Dict{Symbol, Any}(keyargs)
+    args[:phase2] = wrapped[:,:,:,p2ref]
+    args[:TEs] = TEs[[template, p2ref]]
+    if haskey(args, :mag)
+        args[:mag] = args[:mag][:,:,:,template]
+    end
+    return calculateweights(view(wrapped,:,:,:,template); args...)
 end
