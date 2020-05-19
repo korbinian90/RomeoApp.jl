@@ -69,8 +69,12 @@ function unwrapping_main(args)
             flags[i] = true
             settings["verbose"] && println("Calculate and write quality map $i...")
             weights = ROMEO.calculateweights(phase, flags; keyargs...)
-            quality = dropdims(sum(weights; dims=1); dims=1)
-            savenii(quality, "quality_$i", writedir, hdr)
+            if all(weights .<= 1)
+                settings["verbose"] && println("quality map $i skipped for the given inputs")
+            else
+                quality = dropdims(sum(weights; dims=1); dims=1)
+                savenii(quality, "quality_$i", writedir, hdr)
+            end
         end
     end
 
