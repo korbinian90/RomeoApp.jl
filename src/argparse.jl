@@ -1,6 +1,10 @@
 function getargs(args)
     if isempty(args) args = ["--help"] end
-    s = ArgParseSettings(exc_handler=exception_handler)
+    s = ArgParseSettings(
+        exc_handler=exception_handler,
+        add_version=true,
+        version="v1.4.2",
+        )
     @add_arg_table! s begin
         "phase"
             help = "The phase image used for unwrapping"
@@ -10,8 +14,10 @@ function getargs(args)
             help = "The output path and filename"
             default = "unwrapped.nii"
         "--echo-times", "-t"
-            help = """The relative echo times required for temporal unwrapping (default is 1:n)
-                    specified in array or range syntax (eg. [1.5,3.0] or 3.5:3.5:14)
+            help = """The relative echo times required for temporal unwrapping
+                    (default is 1:n) specified in array or range syntax
+                    (eg. [1.5,3.0] or 3.5:3.5:14) or for multiple volumes with
+                    the same time: "ones(<nr_of_time_points>)".
                     Warning: No spaces allowed!! ([1, 2, 3] is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
