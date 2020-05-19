@@ -8,8 +8,12 @@ function unwrapping_main(args)
         writedir = dirname(writedir)
     end
 
-    if settings["magnitude"] == nothing && settings["weights"] == "romeo3"
-        settings["weights"] = "romeo"
+    if settings["weights"] == "romeo"
+        if settings["magnitude"] == nothing
+            settings["weights"] = "romeo4"
+        else
+            settings["weights"] = "romeo3"
+        end
     end
 
     mkpath(writedir)
@@ -53,11 +57,7 @@ function unwrapping_main(args)
     if length(echoes) > 1
         keyargs[:TEs] = getTEs(settings, neco, echoes)
     end
-    if isfile(settings["weights"]) && splitext(settings["weights"])[2] != ""
-        keyargs[:weights] = UInt8.(niread(settings["weights"]))
-    else
-        keyargs[:weights] = Symbol(settings["weights"])
-    end
+    keyargs[:weights] = parseweights(settings)
 
     ## Error messages
     if 1 < length(echoes) && length(echoes) != length(keyargs[:TEs])
@@ -100,4 +100,14 @@ function unwrapping_main(args)
     end
 
     return 0
+end
+
+function ROMEO.calculateweights(phase::AbstractArray{T,4}, weights; TEs, template=2, p2ref=1, keyargs...) where T
+    args = Dict{Symbol, Any}(keyargs)
+    args[:phase2] = phase[:,:,:,p2ref]
+    args[:TEs] = TEs[[template, p2ref]]
+    if haskey(args, :mag)
+        args[:mag] = args[:mag][:,:,:,template]
+    end
+    return ROMEO.calculateweights(view(phase,:,:,:,template), weights; args...)
 end

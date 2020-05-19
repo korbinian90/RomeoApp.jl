@@ -30,8 +30,11 @@ function getargs(args)
             help = "Unwrap only the specified echoes"
             default = ":"
         "--weights", "-w"
-            help = "romeo | romeo2 | romeo3 | bestpath | <4d-weights-file> "
-            default = "romeo3"
+            help = """romeo | romeo2 | romeo3 | romeo4 | bestpath |
+                <4d-weights-file> | <flags>\n
+                <flags> are four bits to activate individual weights
+                (eg. "1010")"""
+            default = "romeo"
         "--compute-B0", "-B"
             help = "EXPERIMENTAL! Calculate combined B0 map in [rad/s]"
             action = :store_true
@@ -87,6 +90,21 @@ function getTEs(settings, neco, echoes)
         TEs = (1:neco)[echoes]
     end
     return TEs
+end
+
+function parseweights(settings)
+    if isfile(settings["weights"]) && splitext(settings["weights"])[2] != ""
+        return UInt8.(niread(settings["weights"]))
+    else
+        try
+            reform = "Bool[$(join(collect(settings["weights"]), ','))]"
+            flags = falses(6)
+            flags[1:4] = eval(Meta.parse(reform))
+            return flags
+        catch
+            return Symbol(settings["weights"])
+        end
+    end
 end
 
 function saveconfiguration(writedir, settings, args)
