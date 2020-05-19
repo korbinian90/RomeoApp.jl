@@ -11,20 +11,21 @@ function getargs(args)
         "--magnitude", "-m"
             help = "The magnitude image (better unwrapping if specified)"
         "--output", "-o"
-            help = "The output path and filename"
+            help = "The output path or filename"
             default = "unwrapped.nii"
         "--echo-times", "-t"
             help = """The relative echo times required for temporal unwrapping
                     (default is 1:n) specified in array or range syntax
-                    (eg. [1.5,3.0] or 3.5:3.5:14) or for multiple volumes with
-                    the same time: "ones(<nr_of_time_points>)".
-                    Warning: No spaces allowed!! ([1, 2, 3] is invalid!)"""
+                    (eg. "[1.5,3.0]" or "3.5:3.5:14") or for multiple volumes
+                    with the same time: "ones(<nr_of_time_points>)"\n
+                    Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
         "--individual-unwrapping", "-i"
-            help = """Unwraps the echoes individually (not temporal)
-                    Temporal unwrapping only works when phase offset is removed (ASPIRE)"""
+            help = """Unwraps the echoes individually (not temporal)\n
+                    Temporal unwrapping only works when phase offset is removed
+                    (ASPIRE)"""
             action = :store_true
         "--unwrap-echoes", "-e"
             help = "Unwrap only the specified echoes"
@@ -39,22 +40,22 @@ function getargs(args)
             help = "EXPERIMENTAL! Calculate combined B0 map in [rad/s]"
             action = :store_true
         "--no-mmap", "-N"
-            help = """Deactivate memory mapping.
-                    Memory mapping might cause problems on network storage"""
+            help = """Deactivate memory mapping. Memory mapping might cause
+                    problems on network storage"""
             action = :store_true
         "--threshold", "-T"
-            help = """<maximum number of wraps>
+            help = """<maximum number of wraps>\n
                     Threshold the unwrapped phase to the maximum number of wraps
-                    Sets exceeding values to 0"""
+                    and sets exceeding values to 0"""
             arg_type = Float64
             default = Inf
         "--verbose", "-v"
             help = "verbose output messages"
             action = :store_true
         "--correct-global", "-g"
-            help = """phase is corrected to remove global n2π phase offset.
-                    The median of phase values (inside mask if given)
-                    is used to calculate the correction term"""
+            help = """Phase is corrected to remove global n2π phase offset. The
+                    median of phase values (inside mask if given) is used to
+                    calculate the correction term"""
             action = :store_true
         "--write-quality", "-q"
             help = """Writes out the ROMEO quality map as a 3D image with one
@@ -71,10 +72,11 @@ end
 
 function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
     if err == ArgParseError("too many arguments")
-        println(stderr, """Wrong argument formatting!
-        Maybe there are unsupported spaces in the array syntax.
-        [1, 2, 3] is wrong; [1,2,3] is correct
-        """)
+        println(stderr,
+            """Wrong argument formatting!\n
+            Maybe there are unsupported spaces in the array syntax\n
+            [1, 2, 3] is wrong; [1,2,3] is correct"""
+        )
     end
     ArgParse.default_handler(settings, err, err_code)
 end
