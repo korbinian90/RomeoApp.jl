@@ -45,25 +45,18 @@ function unwrapping_main(args)
     end
 
     ## get settings
-    if isfile(settings["mask"])
-        keyargs[:mask] = niread(settings["mask"]) .!= 0
-        if size(keyargs[:mask]) != size(phase)[1:3]
-            error("size of mask is $(size(keyargs[:mask])), but it should be $(size(phase)[1:3])!")
-        end
-    elseif settings["mask"] == "robustmask" && haskey(keyargs, :mag)
-        keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,1])
-        savenii(keyargs[:mask], "mask", writedir, hdr)
-    end
+    keyargs[:correctglobal] = settings["correct-global"]
+    keyargs[:weights] = parseweights(settings)
     if length(echoes) > 1
         keyargs[:TEs] = getTEs(settings, neco, echoes)
     end
-    keyargs[:weights] = parseweights(settings)
 
     ## Error messages
     if 1 < length(echoes) && length(echoes) != length(keyargs[:TEs])
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(keyargs[:TEs])) TEs were specified!")
     end
 
+    # no mask defined for writing quality maps
     if settings["write-quality"]
         settings["verbose"] && println("Calculate and write quality map...")
         weights = ROMEO.calculateweights(phase, keyargs[:weights]; keyargs...)
@@ -81,8 +74,14 @@ function unwrapping_main(args)
         end
     end
 
-    if settings["correct-global"]
-        keyargs[:correctglobal] = true
+    if isfile(settings["mask"])
+        keyargs[:mask] = niread(settings["mask"]) .!= 0
+        if size(keyargs[:mask]) != size(phase)[1:3]
+            error("size of mask is $(size(keyargs[:mask])), but it should be $(size(phase)[1:3])!")
+        end
+    elseif settings["mask"] == "robustmask" && haskey(keyargs, :mag)
+        keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,1])
+        savenii(keyargs[:mask], "mask", writedir, hdr)
     end
 
     if settings["individual-unwrapping"] && length(echoes) > 1
