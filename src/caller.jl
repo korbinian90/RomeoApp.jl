@@ -64,6 +64,23 @@ function unwrapping_main(args)
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(keyargs[:TEs])) TEs were specified!")
     end
 
+    if settings["write-quality"]
+        settings["verbose"] && println("Calculate and write quality map...")
+        weights = ROMEO.calculateweights(phase, keyargs[:weights]; keyargs...)
+        quality = dropdims(sum(weights; dims=1); dims=1)
+        savenii(quality, "quality", writedir, hdr)
+    end
+    if settings["write-quality-all"]
+        for i in 1:4
+            flags = falses(6)
+            flags[i] = true
+            settings["verbose"] && println("Calculate and write quality map $i...")
+            weights = ROMEO.calculateweights(phase, flags; keyargs...)
+            quality = dropdims(sum(weights; dims=1); dims=1)
+            savenii(quality, "quality_$i", writedir, hdr)
+        end
+    end
+
     if settings["correct-global"]
         keyargs[:correctglobal] = true
     end

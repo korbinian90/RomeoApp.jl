@@ -23,6 +23,8 @@ configurations = [
     [phasefile, "-m", magfile],
     [phasefile, "-N"],
     [phasefile, "-i"],
+    [phasefile, "-q"],
+    [phasefile, "-Q"],
     [phasefile, "-e", "1:2"],
     [phasefile, "-e", "[1,3]"],
     [phasefile, "-e", "[1, 3]"], # fine here but not in command line

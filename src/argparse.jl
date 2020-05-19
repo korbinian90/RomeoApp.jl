@@ -56,6 +56,15 @@ function getargs(args)
                     The median of phase values (inside mask if given)
                     is used to calculate the correction term"""
             action = :store_true
+        "--write-quality", "-q"
+            help = """Writes out the ROMEO quality map as a 3D image with one
+                    value per voxel"""
+            action = :store_true
+        "--write-quality-all", "-Q"
+            help = """Writes out an individual quality map for each of the
+                    ROMEO weights."""
+            action = :store_true
+
     end
     return parse_args(args, s)
 end
