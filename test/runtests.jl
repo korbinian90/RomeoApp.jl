@@ -11,8 +11,14 @@ magfile = joinpath(p, "Mag.nii")
 function test_romeo(args)
     folder = tempname()
     args = [args..., "-o", folder]
-    @test unwrapping_main(args) == 0
-    @test isfile(joinpath(folder, "unwrapped.nii"))
+    try
+        msg = unwrapping_main(args)
+        @test msg == 0
+        @test isfile(joinpath(folder, "unwrapped.nii"))
+    catch e
+        println(args)
+        println(sprint(showerror, e, catch_backtrace()))
+    end
 end
 
 configurations = [
