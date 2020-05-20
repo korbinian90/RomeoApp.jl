@@ -125,14 +125,14 @@ function unwrapping_main(args)
     return 0
 end
 
-function ROMEO.calculateweights(phase::AbstractArray{T,4}, weights; TEs, template=2, p2ref=1, keyargs...) where T
+function ROMEO.calculateweights(phase::AbstractArray{T,4}; weights, TEs, template=2, p2ref=1, keyargs...) where T
     args = Dict{Symbol, Any}(keyargs)
     args[:phase2] = phase[:,:,:,p2ref]
     args[:TEs] = TEs[[template, p2ref]]
     if haskey(args, :mag)
         args[:mag] = args[:mag][:,:,:,template]
     end
-    return ROMEO.calculateweights(view(phase,:,:,:,template), weights; args...)
+    return ROMEO.calculateweights(view(phase,:,:,:,template); weights=weights, args...)
 end
 
 getvoxelquality(weights) = dropdims(sum(256 .- weights; dims=1); dims=1)
