@@ -60,8 +60,7 @@ function unwrapping_main(args)
     if settings["write-quality"]
         settings["verbose"] && println("Calculate and write quality map...")
         weights = ROMEO.calculateweights(phase, keyargs[:weights]; keyargs...)
-        quality = dropdims(sum(weights; dims=1); dims=1)
-        savenii(quality, "quality", writedir, hdr)
+        savenii(getvoxelquality(weights), "quality", writedir, hdr)
     end
     if settings["write-quality-all"]
         for i in 1:4
@@ -72,8 +71,7 @@ function unwrapping_main(args)
             if all(weights .<= 1)
                 settings["verbose"] && println("quality map $i skipped for the given inputs")
             else
-                quality = dropdims(sum(weights; dims=1); dims=1)
-                savenii(quality, "quality_$i", writedir, hdr)
+                savenii(getvoxelquality(weights), "quality_$i", writedir, hdr)
             end
         end
     end
@@ -131,3 +129,5 @@ function ROMEO.calculateweights(phase::AbstractArray{T,4}, weights; TEs, templat
     end
     return ROMEO.calculateweights(view(phase,:,:,:,template), weights; args...)
 end
+
+getvoxelquality(weights) = dropdims(sum(256 .- weights; dims=1); dims=1)

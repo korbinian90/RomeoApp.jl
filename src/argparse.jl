@@ -17,13 +17,13 @@ function getargs(args)
             help = """The relative echo times required for temporal unwrapping
                     (default is 1:n) specified in array or range syntax
                     (eg. "[1.5,3.0]" or "3.5:3.5:14") or for multiple volumes
-                    with the same time: "ones(<nr_of_time_points>)"\n
+                    with the same time: "ones(<nr_of_time_points>)".
                     Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
         "--individual-unwrapping", "-i"
-            help = """Unwraps the echoes individually (not temporal)\n
+            help = """Unwraps the echoes individually (not temporal).
                     Temporal unwrapping only works when phase offset is removed
                     (ASPIRE)"""
             action = :store_true
@@ -32,9 +32,10 @@ function getargs(args)
             default = ":"
         "--weights", "-w"
             help = """romeo | romeo2 | romeo3 | romeo4 | bestpath |
-                <4d-weights-file> | <flags>\n
+                <4d-weights-file> | <flags>.
                 <flags> are four bits to activate individual weights
-                (eg. "1010")"""
+                (eg. "1010"). The weights are (1)phasecoherence
+                (2)phasegradientcoherence (3)phaselinearity (4)magcoherence"""
             default = "romeo"
         "--compute-B0", "-B"
             help = "EXPERIMENTAL! Calculate combined B0 map in [rad/s]"
@@ -44,7 +45,7 @@ function getargs(args)
                     problems on network storage"""
             action = :store_true
         "--threshold", "-T"
-            help = """<maximum number of wraps>\n
+            help = """<maximum number of wraps>.
                     Threshold the unwrapped phase to the maximum number of wraps
                     and sets exceeding values to 0"""
             arg_type = Float64
@@ -78,8 +79,8 @@ end
 function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
     if err == ArgParseError("too many arguments")
         println(stderr,
-            """Wrong argument formatting!\n
-            Maybe there are unsupported spaces in the array syntax\n
+            """Wrong argument formatting!
+            Maybe there are unsupported spaces in the array syntax
             [1, 2, 3] is wrong; [1,2,3] is correct"""
         )
     end
