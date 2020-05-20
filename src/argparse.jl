@@ -3,7 +3,7 @@ function getargs(args)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v1.4.2",
+        version="v1.5.0",
         )
     @add_arg_table! s begin
         "phase"
@@ -66,11 +66,31 @@ function getargs(args)
             help = """Writes out an individual quality map for each of the
                     ROMEO weights."""
             action = :store_true
-        "--max-seeds", "-s"  
-            - `merge_regions=false`: spatially merge neighboring regions after unwrapping
-            - `correct_regions=false`: bring each regions median closest to 0 by adding n2π
-            - `wrap_addition=0`: [0;π], allows 'linear unwrapping', neighbors can have more
-                (π+wrap_addition) phase difference
+        "--max-seeds", "-s"
+            help = """EXPERIMENTAL! Sets the maximum number of seeds for
+                    unwrapping. Higher values allow more seperated regions."""
+            arg_type = Int
+            default = 1
+        "--merge-regions"
+            help = """EXPERIMENTAL! Spatially merges neighboring regions after
+                    unwrapping."""
+            action = :store_true
+        "--correct-regions"
+            help = """EXPERIMENTAL! Performed after merging. Brings the median
+                    of each region closest to 0 (mod 2π)."""
+            action = :store_true
+        "--wrap-addition"
+            help = """[0;π] EXPERIMENTAL! Usually the true phase difference of
+                    neighboring voxels cannot exceed π to be able to unwrap
+                    them. This setting increases the limit and uses 'linear
+                    unwrapping' of 3 voxels in a line. Neighbors can have
+                    (π + wrap-addition) phase difference."""
+            arg_type = Float64
+            default = 0.0
+        "--temporal-uncertain-unwrapping"
+            help = """EXPERIMENTAL! Uses spatial unwrapping on voxels that have
+                    high uncertainty values after temporal unwrapping."""
+            action = :store_true
 
     end
     return parse_args(args, s)

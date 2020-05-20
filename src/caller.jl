@@ -59,7 +59,7 @@ function unwrapping_main(args)
     # no mask defined for writing quality maps
     if settings["write-quality"]
         settings["verbose"] && println("Calculate and write quality map...")
-        weights = ROMEO.calculateweights(phase, keyargs[:weights]; keyargs...)
+        weights = ROMEO.calculateweights(phase; weights=keyargs[:weights], keyargs...)
         savenii(getvoxelquality(weights), "quality", writedir, hdr)
     end
     if settings["write-quality-all"]
@@ -67,7 +67,7 @@ function unwrapping_main(args)
             flags = falses(6)
             flags[i] = true
             settings["verbose"] && println("Calculate and write quality map $i...")
-            weights = ROMEO.calculateweights(phase, flags; keyargs...)
+            weights = ROMEO.calculateweights(phase; weights=flags, keyargs...)
             if all(weights .<= 1)
                 settings["verbose"] && println("quality map $i skipped for the given inputs")
             else
@@ -86,13 +86,18 @@ function unwrapping_main(args)
         savenii(keyargs[:mask], "mask", writedir, hdr)
     end
 
-    if settings["individual-unwrapping"] && length(echoes) > 1
-        settings["verbose"] && println("perform individual unwrapping...")
-        unwrap_individual!(phase; keyargs...)
-    else
-        settings["verbose"] && println("perform unwrapping...")
-        unwrap!(phase; keyargs...)
-    end
+    keyargs[:maxseeds] = settings["max-seeds"]
+    keyargs[:merge_regions] = settings["merge-regions"]
+    keyargs[:correct_regions] = settings["correct-regions"]
+    keyargs[:wrap_addition] = settings["wrap-addition"]
+    keyargs[:temporal_uncertain_unwrapping] = settings["temporal-uncertain-unwrapping"]
+    keyargs[:individual] = settings["individual-unwrapping"]
+
+    settings["verbose"] && println("perform unwrapping...")
+    regions=zeros(UInt8, size(phase)[1:3])
+    unwrap!(phase; regions=regions, keyargs...)
+    savenii(regions, "regions", writedir, hdr)
+
     settings["verbose"] && println("unwrapping finished!")
 
     if settings["threshold"] != Inf
