@@ -65,6 +65,11 @@ function getargs(args)
             help = """Writes out an individual quality map for each of the
                     ROMEO weights."""
             action = :store_true
+        "--max-seeds", "-s"  
+            - `merge_regions=false`: spatially merge neighboring regions after unwrapping
+            - `correct_regions=false`: bring each regions median closest to 0 by adding n2π
+            - `wrap_addition=0`: [0;π], allows 'linear unwrapping', neighbors can have more
+                (π+wrap_addition) phase difference
 
     end
     return parse_args(args, s)
