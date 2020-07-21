@@ -8,6 +8,8 @@
 Easy way to apply ROMEO unwrapping in the command line without Julia programming experience. This repository is a wrapper of [ROMEO.jl](https://github.com/korbinian90/ROMEO.jl).
 Please cite ROMEO (currently in review) if you are applying it in your method.
 
+Another possibility without requiring a Julia installation is the compiled version under [ROMEO](https://github.com/korbinian90/ROMEO).
+
 ## Getting Started
 
 1. Install Julia
