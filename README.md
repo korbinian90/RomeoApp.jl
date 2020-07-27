@@ -30,7 +30,11 @@ Another possibility without requiring a Julia installation is the compiled versi
 
 3. ROMEO should be ready for command line usage
 
-   TODO explain how to use
+   ```julia
+   julia> using RomeoApp
+   julia> args = "phase.nii -m mag.nii -t [2.1,4.2,6.3] -o /tmp"
+   julia> unwrapping_main(split(args))
+   ```
 
 
 ## License
