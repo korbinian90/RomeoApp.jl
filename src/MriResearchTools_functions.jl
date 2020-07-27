@@ -37,7 +37,7 @@ function approxextrema(I)
 end
 
 savenii(image, name, writedir::Nothing, header=nothing) = nothing
-function savenii(image, name, writedir::String, header=nothing)
+function savenii(image, name, writedir::AbstractString, header=nothing)
     if splitext(name)[2] != ".nii"
         name = name * ".nii"
     end
