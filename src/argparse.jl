@@ -3,7 +3,7 @@ function getargs(args)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v1.4.2",
+        version="v2.0.2",
         )
     @add_arg_table! s begin
         "phase"
