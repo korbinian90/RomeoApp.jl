@@ -44,7 +44,6 @@ function unwrapping_main(args)
         end
     end
 
-    ## get settings
     keyargs[:correctglobal] = settings["correct-global"]
     keyargs[:weights] = parseweights(settings)
     if length(echoes) > 1
@@ -92,13 +91,20 @@ function unwrapping_main(args)
     keyargs[:wrap_addition] = settings["wrap-addition"]
     keyargs[:temporal_uncertain_unwrapping] = settings["temporal-uncertain-unwrapping"]
     keyargs[:individual] = settings["individual-unwrapping"]
+    settings["verbose"] && println("individual unwrapping is $(keyargs[:individual])")
+    keyargs[:template] = settings["template"]
+    settings["verbose"] && println("echo $(keyargs[:template]) used as template")
 
+    ## Perform unwrapping
     settings["verbose"] && println("perform unwrapping...")
     regions=zeros(UInt8, size(phase)[1:3])
     unwrap!(phase; regions=regions, keyargs...)
-    savenii(regions, "regions", writedir, hdr)
-
     settings["verbose"] && println("unwrapping finished!")
+
+    if settings["max-seeds"] > 1
+        settings["verbose"] && println("writing regions...")
+        savenii(regions, "regions", writedir, hdr)
+    end
 
     if settings["threshold"] != Inf
         max = settings["threshold"] * 2π

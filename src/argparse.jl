@@ -40,6 +40,11 @@ function getargs(args)
         "--compute-B0", "-B"
             help = "EXPERIMENTAL! Calculate combined B0 map in [rad/s]"
             action = :store_true
+        "--template"
+            help = """Template echo that is spatially unwrapped and used for temporal
+                    unwrapping"""
+            arg_type = Int
+            default = 2
         "--no-mmap", "-N"
             help = """Deactivate memory mapping. Memory mapping might cause
                     problems on network storage"""

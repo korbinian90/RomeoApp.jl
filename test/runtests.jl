@@ -18,6 +18,7 @@ function test_romeo(args)
     catch e
         println(args)
         println(sprint(showerror, e, catch_backtrace()))
+        @test "test failed" == "with error" # signal a failed test
     end
 end
 
@@ -49,6 +50,8 @@ configurations = [
     [phasefile, "-s", "50", "--merge-regions", "--correct-regions"],
     [phasefile, "--wrap-addition", "0.1"],
     [phasefile, "--temporal-uncertain-unwrapping"],
+    [phasefile, "--template", "1"],
+    [phasefile, "--template", "3"],
 ]
 
 for args in configurations
