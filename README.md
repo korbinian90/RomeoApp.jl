@@ -15,7 +15,7 @@ Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.2
 
 1. Install Julia
 
-   Please install Julia using the binaries from this page https://julialang.org. (Julia 1.3 or newer is required, some package managers install outdated versions)
+   Please install Julia using the binaries from this page https://julialang.org. (Julia 1.5 or newer is required, some package managers install outdated versions)
 
 2. Install RomeoApp
 
