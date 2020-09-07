@@ -44,6 +44,11 @@ configurations = [
     [phasefile, "-T", "4"],
     [phasefile, "-B", "-t", "[2,4,6]"],
     [phasefile, "-B", "-t", "[2, 4, 6]"],
+    [phasefile, "-s", "50"],
+    [phasefile, "-s", "50", "--merge-regions"],
+    [phasefile, "-s", "50", "--merge-regions", "--correct-regions"],
+    [phasefile, "--wrap-addition", "0.1"],
+    [phasefile, "--temporal-uncertain-unwrapping"],
 ]
 
 for args in configurations
