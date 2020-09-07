@@ -38,7 +38,7 @@ function unwrapping_main(args)
 
     keyargs = Dict()
     if settings["magnitude"] != nothing
-        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]).raw,:,:,:,echoes)
+        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes)
         if size(keyargs[:mag]) != size(phase)
             error("size of magnitude and phase does not match!")
         end

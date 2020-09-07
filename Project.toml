@@ -1,7 +1,7 @@
 name = "RomeoApp"
 uuid = "6ec04266-ba88-41a1-94ab-4aa3de757d7e"
 authors = ["Korbinian Eckstein", "High Field MR Centre", "Medical University Vienna"]
-version = "0.1.5"
+version = "0.2.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"

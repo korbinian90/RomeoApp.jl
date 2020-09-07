@@ -6,7 +6,10 @@
 [![Coveralls](https://coveralls.io/repos/github/korbinian90/RomeoApp.jl/badge.svg?branch=master)](https://coveralls.io/github/korbinian90/RomeoApp.jl?branch=master)
 
 Easy way to apply ROMEO unwrapping in the command line without Julia programming experience. This repository is a wrapper of [ROMEO.jl](https://github.com/korbinian90/ROMEO.jl).
-Please cite ROMEO (currently in review) if you are applying it in your method.
+
+Another possibility without requiring a Julia installation is the compiled version under [ROMEO](https://github.com/korbinian90/ROMEO).
+
+Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.214551v1.abstract) if you use it! The link will update to the peer reviewed version after it is published.
 
 ## Getting Started
 
@@ -28,7 +31,11 @@ Please cite ROMEO (currently in review) if you are applying it in your method.
 
 3. ROMEO should be ready for command line usage
 
-   TODO explain how to use
+   ```julia
+   julia> using RomeoApp
+   julia> args = "phase.nii -m mag.nii -t [2.1,4.2,6.3] -o /tmp"
+   julia> unwrapping_main(split(args))
+   ```
 
 
 ## License
