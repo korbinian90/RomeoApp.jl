@@ -28,7 +28,7 @@ function getargs(args)
                     (ASPIRE)"""
             action = :store_true
         "--unwrap-echoes", "-e"
-            help = "Unwrap only the specified echoes"
+            help = "Load only the specified echoes from disk"
             default = ":"
         "--weights", "-w"
             help = """romeo | romeo2 | romeo3 | romeo4 | bestpath |
