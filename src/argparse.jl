@@ -49,7 +49,7 @@ function getargs(args)
             help = """Deactivate memory mapping. Memory mapping might cause
                     problems on network storage"""
             action = :store_true
-        "--threshold", "-T"
+        "--threshold"
             help = """<maximum number of wraps>.
                     Threshold the unwrapped phase to the maximum number of wraps
                     and sets exceeding values to 0"""

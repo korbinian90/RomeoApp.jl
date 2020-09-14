@@ -42,7 +42,7 @@ configurations = [
     [phasefile, "-w", "romeo"],
     [phasefile, "-w", "bestpath"],
     [phasefile, "-w", "1010"],
-    [phasefile, "-T", "4"],
+    [phasefile, "--threshold", "4"],
     [phasefile, "-B", "-t", "[2,4,6]"],
     [phasefile, "-B", "-t", "[2, 4, 6]"],
     [phasefile, "-s", "50"],
