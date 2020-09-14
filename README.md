@@ -25,7 +25,7 @@ Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.2
    ```julia
    julia> ] # Be sure to type the closing bracket via the keyboard
    # Enters the Julia package manager
-   (@v1.4) pkg> add https://github.com/korbinian90/RomeoApp.jl
+   (@v1.5) pkg> add https://github.com/korbinian90/RomeoApp.jl
    # All dependencies are installed automatically
    ```
 
