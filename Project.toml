@@ -1,7 +1,7 @@
 name = "RomeoApp"
 uuid = "6ec04266-ba88-41a1-94ab-4aa3de757d7e"
 authors = ["Korbinian Eckstein", "High Field MR Centre", "Medical University Vienna"]
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
@@ -11,12 +11,6 @@ ROMEO = "1ea8258b-a15d-4adb-ad20-01632f467a84"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-ROMEO = "0.2.1"
-MriResearchTools = "0.2, 0.3"
+MriResearchTools = "0.3"
+ROMEO = "0.2"
 julia = "1.5"
-
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test"]
