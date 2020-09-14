@@ -58,6 +58,18 @@ for args in configurations
     test_romeo(args)
 end
 
+## test no-rescale
+readphase = RomeoApp.readphase
+phasefile_uw = joinpath(tempname(), "unwrapped.nii")
+phasefile_uw_wrong = joinpath(tempname(), "wrong_unwrapped.nii")
+phasefile_uw_again = joinpath(tempname(), "again_unwrapped.nii")
+unwrapping_main([phasefile, "-o", phasefile_uw])
+unwrapping_main([phasefile_uw, "-o", phasefile_uw_wrong])
+unwrapping_main([phasefile_uw, "-o", phasefile_uw_again, "--no-rescale"])
+
+@test readphase(phasefile_uw_again; rescale=false).raw == readphase(phasefile_uw; rescale=false).raw
+@test readphase(phasefile_uw_wrong; rescale=false).raw != readphase(phasefile_uw; rescale=false).raw
+
 end
 
 ## help message

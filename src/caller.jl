@@ -19,7 +19,7 @@ function unwrapping_main(args)
     mkpath(writedir)
     saveconfiguration(writedir, settings, args)
 
-    phasenii = readphase(settings["phase"], mmap=!settings["no-mmap"])
+    phasenii = readphase(settings["phase"], mmap=!settings["no-mmap"], rescale=!settings["no-rescale"])
     hdr = header(phasenii)
     neco = size(phasenii, 4)
 

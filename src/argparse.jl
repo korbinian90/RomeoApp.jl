@@ -3,7 +3,7 @@ function getargs(args)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v3.0.0",
+        version="v3.0.1",
         )
     @add_arg_table! s begin
         "phase"
@@ -48,6 +48,12 @@ function getargs(args)
         "--no-mmap", "-N"
             help = """Deactivate memory mapping. Memory mapping might cause
                     problems on network storage"""
+            action = :store_true
+        "--no-rescale"
+            help = """Deactivate rescaling of input images. By default the
+                    input phase is rescaled to the range [-π;π]. This option
+                    allows inputting already unwrapped phase images without
+                    wrapping them first."""
             action = :store_true
         "--threshold"
             help = """<maximum number of wraps>.
