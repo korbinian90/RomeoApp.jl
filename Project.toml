@@ -6,11 +6,9 @@ version = "0.3.0"
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 MriResearchTools = "557dad86-b9bd-4533-8525-1a39684d020f"
-NIfTI = "a3a9e032-41b5-5fc4-967a-a6b7a19844d3"
 ROMEO = "1ea8258b-a15d-4adb-ad20-01632f467a84"
-Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-MriResearchTools = "0.3"
+MriResearchTools = "0.4"
 ROMEO = "0.2"
 julia = "1.5"

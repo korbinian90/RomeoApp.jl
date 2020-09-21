@@ -9,7 +9,7 @@ function unwrapping_main(args)
     end
 
     if settings["weights"] == "romeo"
-        if settings["magnitude"] == nothing
+        if isnothing(settings["magnitude"])
             settings["weights"] = "romeo4"
         else
             settings["weights"] = "romeo3"
@@ -37,7 +37,7 @@ function unwrapping_main(args)
     phasenii = nothing
 
     keyargs = Dict()
-    if settings["magnitude"] != nothing
+    if !isnothing(settings["magnitude"])
         keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes)
         if size(keyargs[:mag]) != size(phase)
             error("size of magnitude and phase does not match!")
@@ -95,6 +95,19 @@ function unwrapping_main(args)
     keyargs[:template] = settings["template"]
     settings["verbose"] && println("echo $(keyargs[:template]) used as template")
 
+    ## Perform phase offset correction
+    if settings["phase-offset-correction"]
+        settings["verbose"] && println("perform phase offset correction...")
+        if all(keyargs[:TEs] .== 1)
+            error("Phase offset determination requires the echo times!")
+        end
+        po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,1))
+        mag = if haskey(keyargs, :mag) keyargs[:mag] else 1 end
+        phase, _ = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po)
+        savenii(phase, "corrected_phase", writedir, hdr)
+        savenii(angle.(po), "phase_offset", writedir, hdr)
+    end
+
     ## Perform unwrapping
     settings["verbose"] && println("perform unwrapping...")
     regions=zeros(UInt8, size(phase)[1:3])
@@ -115,16 +128,14 @@ function unwrapping_main(args)
     savenii(phase, filename, writedir, hdr)
 
     if settings["compute-B0"]
-        if settings["echo-times"] == nothing
+        if isnothing(settings["echo-times"])
             error("echo times are required for B0 calculation! Unwrapping has been performed")
         end
         if !haskey(keyargs, :mag)
-            keyargs[:mag] = ones(1,1,1,size(phase,4))
+            @warn "B0 frequency estimation without magnitude might result in poor handling of noise in later echoes!"        
+            keyargs[:mag] = to_dim(exp.(-keyargs[:TEs]/20), 4) # T2*=20ms decay (low value to reduce noise problems in later echoes)
         end
-        TEs = reshape(keyargs[:TEs],1,1,1,:)
-        B0 = 1000 * sum(phase .* keyargs[:mag]; dims=4)
-        B0 ./= sum(keyargs[:mag] .* TEs; dims=4)
-
+        B0 = MriResearchTools.calculateB0_unwrapped(phase, keyargs[:mag], keyargs[:TEs])
         savenii(B0, "B0", writedir, hdr)
     end
 

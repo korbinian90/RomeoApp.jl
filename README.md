@@ -44,5 +44,12 @@ Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.2
       $ julia <path-to-file>/romeo.jl phase.nii -m mag.nii -t [2.1,4.2,6.3] -o results
    ```
 
+5. Help
+
+   Calling the Julia script without arguments (or --help) displays all options.
+   ```
+      $ julia <path-to-file>/romeo.jl
+   ```
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/ROMEO.jl/blob/master/LICENSE) for details

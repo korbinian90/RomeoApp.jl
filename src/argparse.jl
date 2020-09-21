@@ -3,7 +3,7 @@ function getargs(args)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v3.0.1",
+        version="v3.1.0",
         )
     @add_arg_table! s begin
         "phase"
@@ -15,18 +15,12 @@ function getargs(args)
             default = "unwrapped.nii"
         "--echo-times", "-t"
             help = """The relative echo times required for temporal unwrapping
-                    (default is 1:n) specified in array or range syntax
-                    (eg. "[1.5,3.0]" or "3.5:3.5:14") or for multiple volumes
-                    with the same time: "ones(<nr_of_time_points>)".
+                    specified in array or range syntax (eg. "[1.5,3.0]" or "3.5:3.5:14").
+                    (default is ones(<nr_of_time_points>) for multiple volumes with the same time)
                     Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
-        "--individual-unwrapping", "-i"
-            help = """Unwraps the echoes individually (not temporal).
-                    Temporal unwrapping only works when phase offset is removed
-                    (ASPIRE)"""
-            action = :store_true
         "--unwrap-echoes", "-e"
             help = "Load only the specified echoes from disk"
             default = ":"
@@ -38,11 +32,23 @@ function getargs(args)
                 (2)phasegradientcoherence (3)phaselinearity (4)magcoherence"""
             default = "romeo"
         "--compute-B0", "-B"
-            help = "EXPERIMENTAL! Calculate combined B0 map in [rad/s]"
+            help = "Calculate combined B0 map in [rad/s]. Phase offset
+                correction might be necessary if not coil-combined with
+                MCPC3Ds/ASPIRE."
+            action = :store_true
+        "--phase-offset-correction"
+            help = """Applies the MCPC3Ds method to perform phase offset
+                    determination and removal (for multi-echo)."""
+            action = :store_true
+        "--individual-unwrapping", "-i"
+            help = """Unwraps the echoes individually (not temporal).
+                    This might be necessary if there is large movement
+                    (timeseries) or phase-offset-correction is not
+                    applicable."""
             action = :store_true
         "--template"
-            help = """Template echo that is spatially unwrapped and used for temporal
-                    unwrapping"""
+            help = """Template echo that is spatially unwrapped and used for
+                    temporal unwrapping"""
             arg_type = Int
             default = 2
         "--no-mmap", "-N"
@@ -124,18 +130,18 @@ function getechoes(settings, neco)
         echoes = [echoes]
     end
     echoes = (1:neco)[echoes]
-    if length(echoes) == 1 echoes = echoes[1] end
+    if (length(echoes) == 1) echoes = echoes[1] end
     return echoes
 end
 
 function getTEs(settings, neco, echoes)
-    if settings["echo-times"] != nothing
-        TEs = eval(Meta.parse(settings["echo-times"]))
-        if length(TEs) == neco
-            TEs = TEs[echoes]
+    TEs = if !isnothing(settings["echo-times"])
+            eval(Meta.parse(settings["echo-times"]))
+        else
+            ones(neco)
         end
-    else
-        TEs = (1:neco)[echoes]
+    if length(TEs) == neco
+        TEs = TEs[echoes]
     end
     return TEs
 end

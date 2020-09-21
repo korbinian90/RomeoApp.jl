@@ -52,6 +52,8 @@ configurations = [
     [phasefile, "--temporal-uncertain-unwrapping"],
     [phasefile, "--template", "1"],
     [phasefile, "--template", "3"],
+    [phasefile, "--phase-offset-correction", "-t", "[2,4,6]"],
+    [phasefile, "-m", magfile, "--phase-offset-correction", "-t", "[2,4,6]"],
 ]
 
 for args in configurations
