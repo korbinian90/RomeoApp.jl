@@ -29,7 +29,7 @@ Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.2
    # All dependencies are installed automatically
    ```
 
-3. ROMEO should be ready for command line usage
+3. Usage in Julia REPL
 
    ```julia
    julia> using RomeoApp
@@ -37,6 +37,12 @@ Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.2
    julia> unwrapping_main(split(args))
    ```
 
+4. Command line usage
+
+   Copy the file `romeo.jl` to a convenient location. Open a command line in the calculation folder. An alias for `romeo` as `julia <path-to-file>/romeo.jl` might be convenient.
+   ```
+      $ julia <path-to-file>/romeo.jl phase.nii -m mag.nii -t [2.1,4.2,6.3] -o results
+   ```
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/ROMEO.jl/blob/master/LICENSE) for details
