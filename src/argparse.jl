@@ -32,7 +32,7 @@ function getargs(args)
                 (2)phasegradientcoherence (3)phaselinearity (4)magcoherence"""
             default = "romeo"
         "--compute-B0", "-B"
-            help = "Calculate combined B0 map in [rad/s]. Phase offset
+            help = "Calculate combined B0 map in [Hz]. Phase offset
                 correction might be necessary if not coil-combined with
                 MCPC3Ds/ASPIRE."
             action = :store_true
