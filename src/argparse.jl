@@ -14,10 +14,11 @@ function getargs(args)
             help = "The output path or filename"
             default = "unwrapped.nii"
         "--echo-times", "-t"
-            help = """The relative echo times required for temporal unwrapping
-                    specified in array or range syntax (eg. "[1.5,3.0]" or "3.5:3.5:14").
-                    (default is ones(<nr_of_time_points>) for multiple volumes with the same time)
-                    Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
+            help = """The relative echo times required for temporal unwrapping 
+                specified in array or range syntax (eg. "[1.5,3.0]" or 
+                "3.5:3.5:14"). (default is ones(<nr_of_time_points>) for 
+                multiple volumes with the same time)
+                Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
@@ -42,29 +43,29 @@ function getargs(args)
             action = :store_true
         "--individual-unwrapping", "-i"
             help = """Unwraps the echoes individually (not temporal).
-                    This might be necessary if there is large movement
-                    (timeseries) or phase-offset-correction is not
-                    applicable."""
+                This might be necessary if there is large movement
+                (timeseries) or phase-offset-correction is not
+                applicable."""
             action = :store_true
         "--template"
             help = """Template echo that is spatially unwrapped and used for
-                    temporal unwrapping"""
+                temporal unwrapping"""
             arg_type = Int
             default = 2
         "--no-mmap", "-N"
             help = """Deactivate memory mapping. Memory mapping might cause
-                    problems on network storage"""
+                problems on network storage"""
             action = :store_true
         "--no-rescale"
             help = """Deactivate rescaling of input images. By default the
-                    input phase is rescaled to the range [-π;π]. This option
-                    allows inputting already unwrapped phase images without
-                    wrapping them first."""
+                input phase is rescaled to the range [-π;π]. This option
+                allows inputting already unwrapped phase images without
+                manually wrapping them first."""
             action = :store_true
         "--threshold"
             help = """<maximum number of wraps>.
-                    Threshold the unwrapped phase to the maximum number of wraps
-                    and sets exceeding values to 0"""
+                Threshold the unwrapped phase to the maximum number of wraps
+                and sets exceeding values to 0"""
             arg_type = Float64
             default = Inf
         "--verbose", "-v"
@@ -72,41 +73,41 @@ function getargs(args)
             action = :store_true
         "--correct-global", "-g"
             help = """Phase is corrected to remove global n2π phase offset. The
-                    median of phase values (inside mask if given) is used to
-                    calculate the correction term"""
+                median of phase values (inside mask if given) is used to
+                calculate the correction term"""
             action = :store_true
         "--write-quality", "-q"
             help = """Writes out the ROMEO quality map as a 3D image with one
-                    value per voxel"""
+                value per voxel"""
             action = :store_true
         "--write-quality-all", "-Q"
             help = """Writes out an individual quality map for each of the
-                    ROMEO weights."""
+                ROMEO weights."""
             action = :store_true
         "--max-seeds", "-s"
             help = """EXPERIMENTAL! Sets the maximum number of seeds for
-                    unwrapping. Higher values allow more seperated regions."""
+                unwrapping. Higher values allow more seperated regions."""
             arg_type = Int
             default = 1
         "--merge-regions"
             help = """EXPERIMENTAL! Spatially merges neighboring regions after
-                    unwrapping."""
+                unwrapping."""
             action = :store_true
         "--correct-regions"
             help = """EXPERIMENTAL! Performed after merging. Brings the median
-                    of each region closest to 0 (mod 2π)."""
+                of each region closest to 0 (mod 2π)."""
             action = :store_true
         "--wrap-addition"
             help = """[0;π] EXPERIMENTAL! Usually the true phase difference of
-                    neighboring voxels cannot exceed π to be able to unwrap
-                    them. This setting increases the limit and uses 'linear
-                    unwrapping' of 3 voxels in a line. Neighbors can have
-                    (π + wrap-addition) phase difference."""
+                neighboring voxels cannot exceed π to be able to unwrap
+                them. This setting increases the limit and uses 'linear
+                unwrapping' of 3 voxels in a line. Neighbors can have
+                (π + wrap-addition) phase difference."""
             arg_type = Float64
             default = 0.0
         "--temporal-uncertain-unwrapping"
             help = """EXPERIMENTAL! Uses spatial unwrapping on voxels that have
-                    high uncertainty values after temporal unwrapping."""
+                high uncertainty values after temporal unwrapping."""
             action = :store_true
 
     end
