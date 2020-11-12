@@ -102,7 +102,7 @@ function unwrapping_main(args)
             error("Phase offset determination requires the echo times!")
         end
         po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,1))
-        mag = if haskey(keyargs, :mag) keyargs[:mag] else 1 end
+        mag = if haskey(keyargs, :mag) keyargs[:mag] else ones(size(phase)) end
         phase, _ = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po)
         savenii(phase, "corrected_phase", writedir, hdr)
         savenii(angle.(po), "phase_offset", writedir, hdr)
