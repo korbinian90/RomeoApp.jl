@@ -32,9 +32,11 @@ function unwrapping_main(args)
             error("echoes=$(settings["unwrap-echoes"]) wrongly formatted!")
         end
     end
+    settings["verbose"] && println("Echoes are $echoes")
 
     phase = phasenii[:,:,:,echoes]
     phasenii = nothing
+    settings["verbose"] && println("Phase loaded!")
 
     keyargs = Dict()
     if !isnothing(settings["magnitude"])
@@ -42,12 +44,14 @@ function unwrapping_main(args)
         if size(keyargs[:mag]) != size(phase)
             error("size of magnitude and phase does not match!")
         end
+        settings["verbose"] && println("Magnitude loaded!")
     end
 
     keyargs[:correctglobal] = settings["correct-global"]
     keyargs[:weights] = parseweights(settings)
     if length(echoes) > 1
         keyargs[:TEs] = getTEs(settings, neco, echoes)
+        settings["verbose"] && println("TEs are $(keyargs[:TEs])")
     end
 
     ## Error messages
@@ -76,18 +80,23 @@ function unwrapping_main(args)
     end
 
     if isfile(settings["mask"])
+        settings["verbose"] && println("Trying to read mask from file $(settings["mask"])")
         keyargs[:mask] = niread(settings["mask"]) .!= 0
         if size(keyargs[:mask]) != size(phase)[1:3]
             error("size of mask is $(size(keyargs[:mask])), but it should be $(size(phase)[1:3])!")
         end
     elseif settings["mask"] == "robustmask" && haskey(keyargs, :mag)
+        settings["verbose"] && println("Calculate robustmask from magnitude, saved as mask.nii")
         keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,1])
         savenii(keyargs[:mask], "mask", writedir, hdr)
     end
 
     keyargs[:maxseeds] = settings["max-seeds"]
+    settings["verbose"] && keyargs[:maxseeds] != 1 && println("Maxseeds are $(keyargs[:maxseeds])")
     keyargs[:merge_regions] = settings["merge-regions"]
+    settings["verbose"] && keyargs[:merge_regions] && println("Region merging is activated")
     keyargs[:correct_regions] = settings["correct-regions"]
+    settings["verbose"] && keyargs[:correct_regions] && println("Region correcting is activated")
     keyargs[:wrap_addition] = settings["wrap-addition"]
     keyargs[:temporal_uncertain_unwrapping] = settings["temporal-uncertain-unwrapping"]
     keyargs[:individual] = settings["individual-unwrapping"]
@@ -97,7 +106,7 @@ function unwrapping_main(args)
 
     ## Perform phase offset correction
     if settings["phase-offset-correction"]
-        settings["verbose"] && println("perform phase offset correction...")
+        settings["verbose"] && println("perform phase offset correction with MCPC3D-S...")
         if all(keyargs[:TEs] .== 1)
             error("Phase offset determination requires the echo times!")
         end
@@ -152,4 +161,7 @@ function ROMEO.calculateweights(phase::AbstractArray{T,4}; weights, TEs, templat
     return ROMEO.calculateweights(view(phase,:,:,:,template); weights=weights, args...)
 end
 
-getvoxelquality(weights) = dropdims(sum(256 .- weights; dims=1); dims=1)
+function getvoxelquality(weights)
+    w = [ifelse(w != 0, w, 256) for w in weights]
+    Float32.(dropdims(sum(256 .- w; dims=1); dims=1))
+end
