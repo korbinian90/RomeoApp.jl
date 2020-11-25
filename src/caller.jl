@@ -59,10 +59,23 @@ function unwrapping_main(args)
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(keyargs[:TEs])) TEs were specified!")
     end
 
+    keyargs[:maxseeds] = settings["max-seeds"]
+    settings["verbose"] && keyargs[:maxseeds] != 1 && println("Maxseeds are $(keyargs[:maxseeds])")
+    keyargs[:merge_regions] = settings["merge-regions"]
+    settings["verbose"] && keyargs[:merge_regions] && println("Region merging is activated")
+    keyargs[:correct_regions] = settings["correct-regions"]
+    settings["verbose"] && keyargs[:correct_regions] && println("Region correcting is activated")
+    keyargs[:wrap_addition] = settings["wrap-addition"]
+    keyargs[:temporal_uncertain_unwrapping] = settings["temporal-uncertain-unwrapping"]
+    keyargs[:individual] = settings["individual-unwrapping"]
+    settings["verbose"] && println("individual unwrapping is $(keyargs[:individual])")
+    keyargs[:template] = settings["template"]
+    settings["verbose"] && println("echo $(keyargs[:template]) used as template")
+
     # no mask defined for writing quality maps
     if settings["write-quality"]
         settings["verbose"] && println("Calculate and write quality map...")
-        weights = ROMEO.calculateweights(phase; weights=keyargs[:weights], keyargs...)
+        weights = ROMEO.calculateweights(phase; keyargs...)
         savenii(getvoxelquality(weights), "quality", writedir, hdr)
     end
     if settings["write-quality-all"]
@@ -70,8 +83,8 @@ function unwrapping_main(args)
             flags = falses(6)
             flags[i] = true
             settings["verbose"] && println("Calculate and write quality map $i...")
-            weights = ROMEO.calculateweights(phase; weights=flags, keyargs...)
-            if all(weights .<= 1)
+            weights = ROMEO.calculateweights(phase, flags, Float32, x->x; keyargs...)
+            if all(weights[:,1:end-1,1:end-1,1:end-1] .== 1.0)
                 settings["verbose"] && println("quality map $i skipped for the given inputs")
             else
                 savenii(getvoxelquality(weights), "quality_$i", writedir, hdr)
@@ -90,19 +103,6 @@ function unwrapping_main(args)
         keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,1])
         savenii(keyargs[:mask], "mask", writedir, hdr)
     end
-
-    keyargs[:maxseeds] = settings["max-seeds"]
-    settings["verbose"] && keyargs[:maxseeds] != 1 && println("Maxseeds are $(keyargs[:maxseeds])")
-    keyargs[:merge_regions] = settings["merge-regions"]
-    settings["verbose"] && keyargs[:merge_regions] && println("Region merging is activated")
-    keyargs[:correct_regions] = settings["correct-regions"]
-    settings["verbose"] && keyargs[:correct_regions] && println("Region correcting is activated")
-    keyargs[:wrap_addition] = settings["wrap-addition"]
-    keyargs[:temporal_uncertain_unwrapping] = settings["temporal-uncertain-unwrapping"]
-    keyargs[:individual] = settings["individual-unwrapping"]
-    settings["verbose"] && println("individual unwrapping is $(keyargs[:individual])")
-    keyargs[:template] = settings["template"]
-    settings["verbose"] && println("echo $(keyargs[:template]) used as template")
 
     ## Perform phase offset correction
     if settings["phase-offset-correction"]
@@ -151,17 +151,23 @@ function unwrapping_main(args)
     return 0
 end
 
-function ROMEO.calculateweights(phase::AbstractArray{T,4}; weights, TEs, template=2, p2ref=1, keyargs...) where T
+function ROMEO.calculateweights(phase::AbstractArray{T,4}, flags=false, type=false, rescale=false; weights, TEs, template=2, p2ref=1, keyargs...) where T
     args = Dict{Symbol, Any}(keyargs)
     args[:phase2] = phase[:,:,:,p2ref]
     args[:TEs] = TEs[[template, p2ref]]
     if haskey(args, :mag)
         args[:mag] = args[:mag][:,:,:,template]
     end
-    return ROMEO.calculateweights(view(phase,:,:,:,template); weights=weights, args...)
+    if type == false && rescale == false && flags == false
+        return ROMEO.calculateweights(view(phase,:,:,:,template); weights=weights, args...)
+    else
+        return ROMEO.calculateweights_romeo(view(phase,:,:,:,template), flags, type, rescale; args...)
+    end
 end
 
-function getvoxelquality(weights)
-    w = [ifelse(w != 0, w, 256) for w in weights]
-    Float32.(dropdims(sum(256 .- w; dims=1); dims=1))
+function getvoxelquality(weights::AbstractArray{<:Integer})
+    w = [ifelse(w != 0, 256 - w, 0) for w in weights]
+    Float32.(dropdims(sum(w; dims=1); dims=1))
 end
+
+getvoxelquality(w::AbstractArray{<:AbstractFloat}) = dropdims(sum(w; dims=1); dims=1) ./ 3

@@ -72,6 +72,16 @@ unwrapping_main([phasefile_uw, "-o", phasefile_uw_again, "--no-rescale"])
 @test readphase(phasefile_uw_again; rescale=false).raw == readphase(phasefile_uw; rescale=false).raw
 @test readphase(phasefile_uw_wrong; rescale=false).raw != readphase(phasefile_uw; rescale=false).raw
 
+## test quality map
+niread = RomeoApp.niread
+tmpdir = mktempdir()
+unwrapping_main([phasefile, "-m", magfile, "-o", tmpdir, "-qQ"])
+fns = joinpath.(tmpdir, ["quality.nii", ("quality_$i.nii" for i in 1:4)...])
+@show fns
+for i in 1:length(fns), j in i+1:length(fns)
+    @test niread(fns[i]).raw != niread(fns[j]).raw
+end
+
 end
 
 ## help message
