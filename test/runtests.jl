@@ -35,7 +35,8 @@ configurations = [
     [phasefile, "-e", "1:2"],
     [phasefile, "-e", "[1,3]"],
     [phasefile, "-e", "[1, 3]"], # fine here but not in command line
-    [phasefile, "-k", "nomask"],
+    [phasefile, "-k", "robustmask"],
+    [phasefile, "-u"],
     [phasefile, "-t", "[2,4,6]"],
     [phasefile, "-t", "2:2:6"],
     [phasefile, "-t", "[2.1,4.2,6.3]"],

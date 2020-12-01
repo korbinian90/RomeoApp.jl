@@ -21,7 +21,11 @@ function getargs(args)
                 Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
-            default = "robustmask"
+            default = "nomask"
+        "--mask-unwrapped", "-u"
+            help = """Apply the mask on the unwrapped result. If mask is 
+                "nomask", sets it to "robustmask"."""
+            action = :store_true
         "--unwrap-echoes", "-e"
             help = "Load only the specified echoes from disk"
             default = ":"

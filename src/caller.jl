@@ -16,6 +16,10 @@ function unwrapping_main(args)
         end
     end
 
+    if settings["mask-unwrapped"] && settings["mask"] == "nomask"
+        settings["mask"] = "robustmask"
+    end
+
     mkpath(writedir)
     saveconfiguration(writedir, settings, args)
 
@@ -92,6 +96,7 @@ function unwrapping_main(args)
         end
     end
 
+    ## set mask
     if isfile(settings["mask"])
         settings["verbose"] && println("Trying to read mask from file $(settings["mask"])")
         keyargs[:mask] = niread(settings["mask"]) .!= 0
@@ -100,7 +105,7 @@ function unwrapping_main(args)
         end
     elseif settings["mask"] == "robustmask" && haskey(keyargs, :mag)
         settings["verbose"] && println("Calculate robustmask from magnitude, saved as mask.nii")
-        keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,1])
+        keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,keyargs[:template]])
         savenii(keyargs[:mask], "mask", writedir, hdr)
     end
 
@@ -132,6 +137,10 @@ function unwrapping_main(args)
         max = settings["threshold"] * 2π
         phase[phase .> max] .= 0
         phase[phase .< -max] .= 0
+    end
+
+    if settings["mask-unwrapped"] && haskey(keyargs, :mask)
+        phase[.!keyargs[:mask]] .= 0
     end
 
     savenii(phase, filename, writedir, hdr)
