@@ -79,15 +79,15 @@ function unwrapping_main(args)
     # no mask defined for writing quality maps
     if settings["write-quality"]
         settings["verbose"] && println("Calculate and write quality map...")
-        weights = ROMEO.calculateweights(phase; keyargs...)
+        weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs...)
         savenii(getvoxelquality(weights), "quality", writedir, hdr)
     end
     if settings["write-quality-all"]
         for i in 1:4
-            flags = falses(6)
+            flags = falses(4)
             flags[i] = true
             settings["verbose"] && println("Calculate and write quality map $i...")
-            weights = ROMEO.calculateweights(phase, flags, Float32, x->x; keyargs...)
+            weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs..., weights=flags)
             if all(weights[:,1:end-1,1:end-1,1:end-1] .== 1.0)
                 settings["verbose"] && println("quality map $i skipped for the given inputs")
             else
@@ -160,23 +160,15 @@ function unwrapping_main(args)
     return 0
 end
 
-function ROMEO.calculateweights(phase::AbstractArray{T,4}, flags=false, type=false, rescale=false; weights, TEs, template=2, p2ref=1, keyargs...) where T
+function ROMEO.calculateweights(phase::AbstractArray{T,4}; TEs, template=2, p2ref=1, keyargs...) where T
     args = Dict{Symbol, Any}(keyargs)
     args[:phase2] = phase[:,:,:,p2ref]
     args[:TEs] = TEs[[template, p2ref]]
     if haskey(args, :mag)
         args[:mag] = args[:mag][:,:,:,template]
     end
-    if type == false && rescale == false && flags == false
-        return ROMEO.calculateweights(view(phase,:,:,:,template); weights=weights, args...)
-    else
-        return ROMEO.calculateweights_romeo(view(phase,:,:,:,template), flags, type, rescale; args...)
-    end
-end
-
-function getvoxelquality(weights::AbstractArray{<:Integer})
-    w = [ifelse(w != 0, 256 - w, 0) for w in weights]
-    Float32.(dropdims(sum(w; dims=1); dims=1))
+    return ROMEO.calculateweights(view(phase,:,:,:,template); args...)
+    
 end
 
 getvoxelquality(w::AbstractArray{<:AbstractFloat}) = dropdims(sum(w; dims=1); dims=1) ./ 3
