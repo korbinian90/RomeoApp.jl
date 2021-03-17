@@ -13,8 +13,12 @@ magfile = joinpath(p, "Mag.nii")
 tmpdir = mktempdir()
 phasefile_1eco = joinpath(tmpdir, "Phase.nii")
 magfile_1eco = joinpath(tmpdir, "Mag.nii")
+phasefile_1arreco = joinpath(tmpdir, "Phase.nii")
+magfile_1arreco = joinpath(tmpdir, "Mag.nii")
 savenii(niread(phasefile)[:,:,:,1], phasefile_1eco)
 savenii(niread(magfile)[:,:,:,1], magfile_1eco)
+savenii(niread(phasefile)[:,:,:,[1]], phasefile_1arreco)
+savenii(niread(magfile)[:,:,:,[1]], magfile_1arreco)
 
 function test_romeo(args)
     folder = tempname()
@@ -48,12 +52,13 @@ configurations(phasefile, magfile) = [
     [phasefile, "-s", "50", "--merge-regions"],
     [phasefile, "-s", "50", "--merge-regions", "--correct-regions"],
     [phasefile, "--wrap-addition", "0.1"],
+    [phasefile, "-m", magfile, "-k", "robustmask"],
+    [phasefile, "-m", magfile, "-k", "nomask"],
 ]
 configurations_me(phasefile, magfile) = [
     [phasefile, "-e", "1:2"],
     [phasefile, "-e", "[1,3]"],
     [phasefile, "-e", "[1, 3]"], # fine here but not in command line
-    [phasefile, "-k", "robustmask"],
     [phasefile, "-t", "[2,4,6]"],
     [phasefile, "-t", "2:2:6"],
     [phasefile, "-t", "[2.1,4.2,6.3]"],
@@ -66,7 +71,8 @@ configurations_me(phasefile, magfile) = [
     [phasefile, "-m", magfile, "--phase-offset-correction", "-t", "[2,4,6]"],
 ]
 
-for (pf, mf) in [(phasefile, magfile), (phasefile_1eco, magfile_1eco)], args in configurations(pf, mf)
+files = [(phasefile, magfile), (phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
+for (pf, mf) in files, args in configurations(pf, mf)
     test_romeo(args)
 end
 for args in configurations_me(phasefile, magfile)

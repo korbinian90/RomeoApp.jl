@@ -21,7 +21,7 @@ function getargs(args)
                 Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
-            default = "nomask"
+            default = "robustmask"
         "--mask-unwrapped", "-u"
             help = """Apply the mask on the unwrapped result. If mask is 
                 "nomask", sets it to "robustmask"."""

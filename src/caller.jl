@@ -105,7 +105,9 @@ function unwrapping_main(args)
         end
     elseif settings["mask"] == "robustmask" && haskey(keyargs, :mag)
         settings["verbose"] && println("Calculate robustmask from magnitude, saved as mask.nii")
-        keyargs[:mask] = robustmask(keyargs[:mag][:,:,:,keyargs[:template]])
+        mag = keyargs[:mag]
+        template_echo = min(keyargs[:template], size(mag, 4))
+        keyargs[:mask] = robustmask(mag[:,:,:,template_echo])
         savenii(keyargs[:mask], "mask", writedir, hdr)
     end
 
