@@ -34,41 +34,41 @@ function test_romeo(args)
     end
 end
 
-configurations(phasefile, magfile) = [
-    [phasefile],
-    [phasefile, "-v"],
-    [phasefile, "-g"],
-    [phasefile, "-m", magfile],
-    [phasefile, "-N"],
-    [phasefile, "-i"],
-    [phasefile, "-q"],
-    [phasefile, "-Q"],
-    [phasefile, "-u"],
-    [phasefile, "-w", "romeo"],
-    [phasefile, "-w", "bestpath"],
-    [phasefile, "-w", "1010"],
-    [phasefile, "--threshold", "4"],
-    [phasefile, "-s", "50"],
-    [phasefile, "-s", "50", "--merge-regions"],
-    [phasefile, "-s", "50", "--merge-regions", "--correct-regions"],
-    [phasefile, "--wrap-addition", "0.1"],
-    [phasefile, "-m", magfile, "-k", "robustmask"],
-    [phasefile, "-m", magfile, "-k", "nomask"],
+configurations(phasefile, magfile) = vcat(configurations.([[phasefile], [phasefile, "-m", magfile]])...)
+configurations(pm) = [
+    [pm...],
+    [pm..., "-v"],
+    [pm..., "-g"],
+    [pm..., "-N"],
+    [pm..., "-i"],
+    [pm..., "-q"],
+    [pm..., "-Q"],
+    [pm..., "-m", magfile, "-u"],
+    [pm..., "-w", "romeo"],
+    [pm..., "-w", "bestpath"],
+    [pm..., "-w", "1010"],
+    [pm..., "--threshold", "4"],
+    [pm..., "-s", "50"],
+    [pm..., "-s", "50", "--merge-regions"],
+    [pm..., "-s", "50", "--merge-regions", "--correct-regions"],
+    [pm..., "--wrap-addition", "0.1"],
+    [pm..., "-k", "robustmask"],
+    [pm..., "-k", "nomask"],
 ]
-configurations_me(phasefile, magfile) = [
-    [phasefile, "-e", "1:2"],
-    [phasefile, "-e", "[1,3]"],
-    [phasefile, "-e", "[1, 3]"], # fine here but not in command line
-    [phasefile, "-t", "[2,4,6]"],
-    [phasefile, "-t", "2:2:6"],
-    [phasefile, "-t", "[2.1,4.2,6.3]"],
-    [phasefile, "-B", "-t", "[2,4,6]"],
-    [phasefile, "-B", "-t", "[2, 4, 6]"],
-    [phasefile, "--temporal-uncertain-unwrapping"],
-    [phasefile, "--template", "1"],
-    [phasefile, "--template", "3"],
-    [phasefile, "--phase-offset-correction", "-t", "[2,4,6]"],
-    [phasefile, "-m", magfile, "--phase-offset-correction", "-t", "[2,4,6]"],
+configurations_me(phasefile, magfile) = vcat(configurations_me.([[phasefile], [phasefile, "-m", magfile]])...)
+configurations_me(pm) = [
+    [pm..., "-e", "1:2"],
+    [pm..., "-e", "[1,3]"],
+    [pm..., "-e", "[1, 3]"], # fine here but not in command line
+    [pm..., "-t", "[2,4,6]"],
+    [pm..., "-t", "2:2:6"],
+    [pm..., "-t", "[2.1,4.2,6.3]"],
+    [pm..., "-B", "-t", "[2,4,6]"],
+    [pm..., "-B", "-t", "[2, 4, 6]"],
+    [pm..., "--temporal-uncertain-unwrapping"],
+    [pm..., "--template", "1"],
+    [pm..., "--template", "3"],
+    [pm..., "--phase-offset-correction", "-t", "[2,4,6]"],
 ]
 
 files = [(phasefile, magfile), (phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]

@@ -142,7 +142,7 @@ function unwrapping_main(args)
     end
 
     if settings["mask-unwrapped"] && haskey(keyargs, :mask)
-        phase[.!keyargs[:mask]] .= 0
+        phase .*= keyargs[:mask]
     end
 
     savenii(phase, filename, writedir, hdr)
