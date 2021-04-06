@@ -103,6 +103,6 @@ end
 
 end
 
-## help message
+## print version to verify
 println()
-unwrapping_main([])
+unwrapping_main(["--version"])
