@@ -7,7 +7,7 @@ Easy way to apply ROMEO unwrapping in the command line without Julia programming
 
 Another possibility without requiring a Julia installation is the compiled version under [ROMEO](https://github.com/korbinian90/ROMEO).
 
-Please cite [ROMEO bioRxiv](https://www.biorxiv.org/content/10.1101/2020.07.24.214551v1.abstract) if you use it! The link will update to the peer reviewed version after it is published.
+Please cite [ROMEO](https://doi.org/10.1002/mrm.28563) if you use it!
 
 ## Getting Started
 
