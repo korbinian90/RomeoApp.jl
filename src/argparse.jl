@@ -177,7 +177,6 @@ end
 
 function saveconfiguration(writedir, settings, args)
     writedir = abspath(writedir)
-    @show writedir
     open(joinpath(writedir, "settings_romeo.txt"), "w") do io
         for (fname, val) in settings
             if !(typeof(val) <: AbstractArray)
