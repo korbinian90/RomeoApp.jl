@@ -3,7 +3,7 @@ function getargs(args)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v3.2.0",
+        version="v3.1.5",
         )
     @add_arg_table! s begin
         "phase"
@@ -17,8 +17,8 @@ function getargs(args)
             help = """The relative echo times required for temporal unwrapping 
                 specified in array or range syntax (eg. "[1.5,3.0]" or 
                 "3.5:3.5:14"). (default is ones(<nr_of_time_points>) for 
-                multiple volumes with the same time)
-                Warning: No spaces allowed!! ("[1, 2, 3]" is invalid!)"""
+                multiple volumes with the same time)"""
+            nargs = '+'
         "--mask", "-k"
             help = "nomask | robustmask | <mask_file>"
             default = "robustmask"
@@ -28,7 +28,8 @@ function getargs(args)
             action = :store_true
         "--unwrap-echoes", "-e"
             help = "Load only the specified echoes from disk"
-            default = ":"
+            default = [":"]
+            nargs = '+'
         "--weights", "-w"
             help = """romeo | romeo2 | romeo3 | romeo4 | bestpath |
                 <4d-weights-file> | <flags>.
@@ -47,6 +48,8 @@ function getargs(args)
                 determination and removal (for multi-echo). 'bipolar' also 
                 removes eddy current artefacts (requires >= 3 echoes)"""
             default = "off"
+            nargs = '?'
+            constant = "on"
         "--individual-unwrapping", "-i"
             help = """Unwraps the echoes individually (not temporal).
                 This might be necessary if there is large movement
@@ -124,29 +127,33 @@ function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
     if err == ArgParseError("too many arguments")
         println(stderr,
             """Wrong argument formatting!
-            Maybe there are unsupported spaces in the array syntax
-            [1, 2, 3] is wrong; [1,2,3] is correct"""
+            Maybe there are unsupported spaces"""
         )
     end
     ArgParse.default_handler(settings, err, err_code)
 end
 
 function getechoes(settings, neco)
-    echoes = eval(Meta.parse(settings["unwrap-echoes"]))
-    if typeof(echoes) <: Int
+    echoes = eval(Meta.parse(join(settings["unwrap-echoes"], " ")))
+    if echoes isa Int
         echoes = [echoes]
+    elseif echoes isa Matrix
+        echoes = echoes[:]
     end
-    echoes = (1:neco)[echoes]
+    echoes = (1:neco)[echoes] # expands ":"
     if (length(echoes) == 1) echoes = echoes[1] end
     return echoes
 end
 
 function getTEs(settings, neco, echoes)
-    TEs = if !isnothing(settings["echo-times"])
-            eval(Meta.parse(settings["echo-times"]))
+    TEs = if !isempty(settings["echo-times"])
+            eval(Meta.parse(join(settings["echo-times"], " ")))
         else
             ones(neco)
-        end
+        end 
+    if TEs isa Matrix
+        TEs = TEs[:]
+    end
     if length(TEs) == neco
         TEs = TEs[echoes]
     end

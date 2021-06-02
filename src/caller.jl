@@ -1,6 +1,6 @@
 function unwrapping_main(args)
     settings = getargs(args)
-
+    
     writedir = settings["output"]
     filename = "unwrapped"
     if occursin(r"\.nii$", writedir)
@@ -112,8 +112,9 @@ function unwrapping_main(args)
     end
 
     ## Perform phase offset correction
-    if settings["phase-offset-correction"] in ["on", "bipolar"]
-        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($(settings["phase-offset-correction"]))")
+    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
+        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
+        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
         if all(keyargs[:TEs] .== 1)
             error("Phase offset determination requires the echo times!")
         end

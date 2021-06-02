@@ -59,16 +59,16 @@ configurations_me(phasefile, magfile) = vcat(configurations_me.([[phasefile], [p
 configurations_me(pm) = [
     [pm..., "-e", "1:2"],
     [pm..., "-e", "[1,3]"],
-    [pm..., "-e", "[1, 3]"], # fine here but not in command line
+    [pm..., "-e", "[1", "3]"],
     [pm..., "-t", "[2,4,6]"],
     [pm..., "-t", "2:2:6"],
     [pm..., "-t", "[2.1,4.2,6.3]"],
     [pm..., "-B", "-t", "[2,4,6]"],
-    [pm..., "-B", "-t", "[2, 4, 6]"],
+    [pm..., "-B", "-t", "[2" ,"4", "6]"], # when written like [2 4 6] in command line
     [pm..., "--temporal-uncertain-unwrapping"],
     [pm..., "--template", "1"],
     [pm..., "--template", "3"],
-    [pm..., "--phase-offset-correction", "on", "-t", "[2,4,6]"],
+    [pm..., "--phase-offset-correction", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]", "-v"],
 ]
 
