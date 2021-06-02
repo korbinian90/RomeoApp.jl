@@ -3,7 +3,7 @@ function getargs(args)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v3.1.0",
+        version="v3.2.0",
         )
     @add_arg_table! s begin
         "phase"
@@ -37,14 +37,16 @@ function getargs(args)
                 (2)phasegradientcoherence (3)phaselinearity (4)magcoherence"""
             default = "romeo"
         "--compute-B0", "-B"
-            help = "Calculate combined B0 map in [Hz]. Phase offset
+            help = """Calculate combined B0 map in [Hz]. Phase offset
                 correction might be necessary if not coil-combined with
-                MCPC3Ds/ASPIRE."
+                MCPC3Ds/ASPIRE."""
             action = :store_true
         "--phase-offset-correction"
-            help = """Applies the MCPC3Ds method to perform phase offset
-                    determination and removal (for multi-echo)."""
-            action = :store_true
+            help = """on | off | bipolar.
+                Applies the MCPC3Ds method to perform phase offset
+                determination and removal (for multi-echo). 'bipolar' also 
+                removes eddy current artefacts (requires >= 3 echoes)"""
+            default = "off"
         "--individual-unwrapping", "-i"
             help = """Unwraps the echoes individually (not temporal).
                 This might be necessary if there is large movement

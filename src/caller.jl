@@ -112,14 +112,15 @@ function unwrapping_main(args)
     end
 
     ## Perform phase offset correction
-    if settings["phase-offset-correction"]
-        settings["verbose"] && println("perform phase offset correction with MCPC3D-S...")
+    if settings["phase-offset-correction"] in ["on", "bipolar"]
+        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($(settings["phase-offset-correction"]))")
         if all(keyargs[:TEs] .== 1)
             error("Phase offset determination requires the echo times!")
         end
         po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,1))
         mag = if haskey(keyargs, :mag) keyargs[:mag] else ones(size(phase)) end
-        phase, _ = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po)
+        bipolar_correction = settings["phase-offset-correction"] == "bipolar"
+        phase, _ = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po, bipolar_correction=bipolar_correction)
         savenii(phase, "corrected_phase", writedir, hdr)
         savenii(angle.(po), "phase_offset", writedir, hdr)
     end

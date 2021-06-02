@@ -68,7 +68,8 @@ configurations_me(pm) = [
     [pm..., "--temporal-uncertain-unwrapping"],
     [pm..., "--template", "1"],
     [pm..., "--template", "3"],
-    [pm..., "--phase-offset-correction", "-t", "[2,4,6]"],
+    [pm..., "--phase-offset-correction", "on", "-t", "[2,4,6]"],
+    [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]", "-v"],
 ]
 
 files = [(phasefile, magfile), (phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
