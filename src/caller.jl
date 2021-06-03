@@ -99,7 +99,7 @@ function unwrapping_main(args)
     ## set mask
     if isfile(settings["mask"])
         settings["verbose"] && println("Trying to read mask from file $(settings["mask"])")
-        keyargs[:mask] = niread(settings["mask"]) .!= 0
+        keyargs[:mask] = niread(settings["mask"]).raw .!= 0
         if size(keyargs[:mask]) != size(phase)[1:3]
             error("size of mask is $(size(keyargs[:mask])), but it should be $(size(phase)[1:3])!")
         end
