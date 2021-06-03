@@ -22,7 +22,7 @@ savenii(niread(magfile)[:,:,:,[1]], magfile_1arreco)
 
 function test_romeo(args)
     folder = tempname()
-    args = [args..., "-o", folder]
+    args = [args..., "-o", folder, "-v"]
     try
         msg = unwrapping_main(args)
         @test msg == 0
@@ -37,7 +37,6 @@ end
 configurations(phasefile, magfile) = vcat(configurations.([[phasefile], [phasefile, "-m", magfile]])...)
 configurations(pm) = [
     [pm...],
-    [pm..., "-v"],
     [pm..., "-g"],
     [pm..., "-N"],
     [pm..., "-i"],
