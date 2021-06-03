@@ -1,12 +1,19 @@
 function getargs(args)
-    if isempty(args) args = ["--help"] end
+    if isempty(args)
+        args = ["--help"]
+    else
+        if !('-' in args[1]) prepend!(args, Ref("-p")) end # if phase is first without -p
+        if length(args) >= 2 && !("-p" in args || "--phase" in args) && !('-' in args[end-1]) # if phase is last without -p
+            insert!(args, length(args), "-p")
+        end
+    end
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
         version="v3.1.5",
         )
     @add_arg_table! s begin
-        "phase"
+        "--phase", "-p"
             help = "The phase image used for unwrapping"
         "--magnitude", "-m"
             help = "The magnitude image (better unwrapping if specified)"
