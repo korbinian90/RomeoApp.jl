@@ -38,13 +38,13 @@ function unwrapping_main(args)
     end
     settings["verbose"] && println("Echoes are $echoes")
 
-    phase = phasenii[:,:,:,echoes]
+    phase = phasenii[:,:,:,echoes,:]
     phasenii = nothing
     settings["verbose"] && println("Phase loaded!")
 
     keyargs = Dict()
     if !isnothing(settings["magnitude"])
-        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes)
+        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes,:) # why view?
         if size(keyargs[:mag]) != size(phase)
             error("size of magnitude and phase does not match!")
         end
@@ -63,6 +63,25 @@ function unwrapping_main(args)
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(keyargs[:TEs])) TEs were specified!")
     end
 
+    ## Perform phase offset correction
+    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
+        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
+        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
+        if all(keyargs[:TEs] .== 1)
+            error("Phase offset determination requires the echo times!")
+        end
+        po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,1))
+        mag = if haskey(keyargs, :mag) keyargs[:mag] else ones(size(phase)) end # TODO trues instead ones?
+        bipolar_correction = settings["phase-offset-correction"] == "bipolar"
+        phase, mcomb = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po, bipolar_correction=bipolar_correction)
+        if size(mag, 5) != 1
+            keyargs[:mag] = mcomb
+        end
+        settings["verbose"] && println("Saving corrected_phase and phase_offset")
+        savenii(phase, "corrected_phase", writedir, hdr)
+        settings["verbose"] && savenii(angle.(po), "phase_offset", writedir, hdr)
+    end
+
     keyargs[:maxseeds] = settings["max-seeds"]
     settings["verbose"] && keyargs[:maxseeds] != 1 && println("Maxseeds are $(keyargs[:maxseeds])")
     keyargs[:merge_regions] = settings["merge-regions"]
@@ -75,26 +94,6 @@ function unwrapping_main(args)
     settings["verbose"] && println("individual unwrapping is $(keyargs[:individual])")
     keyargs[:template] = settings["template"]
     settings["verbose"] && println("echo $(keyargs[:template]) used as template")
-
-    # no mask defined for writing quality maps
-    if settings["write-quality"]
-        settings["verbose"] && println("Calculate and write quality map...")
-        weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs...)
-        savenii(getvoxelquality(weights), "quality", writedir, hdr)
-    end
-    if settings["write-quality-all"]
-        for i in 1:4
-            flags = falses(4)
-            flags[i] = true
-            settings["verbose"] && println("Calculate and write quality map $i...")
-            weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs..., weights=flags)
-            if all(weights[:,1:end-1,1:end-1,1:end-1] .== 1.0)
-                settings["verbose"] && println("quality map $i skipped for the given inputs")
-            else
-                savenii(getvoxelquality(weights), "quality_$i", writedir, hdr)
-            end
-        end
-    end
 
     ## set mask
     if isfile(settings["mask"])
@@ -109,21 +108,6 @@ function unwrapping_main(args)
         template_echo = min(keyargs[:template], size(mag, 4))
         keyargs[:mask] = robustmask(mag[:,:,:,template_echo])
         savenii(keyargs[:mask], "mask", writedir, hdr)
-    end
-
-    ## Perform phase offset correction
-    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
-        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
-        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
-        if all(keyargs[:TEs] .== 1)
-            error("Phase offset determination requires the echo times!")
-        end
-        po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,1))
-        mag = if haskey(keyargs, :mag) keyargs[:mag] else ones(size(phase)) end
-        bipolar_correction = settings["phase-offset-correction"] == "bipolar"
-        phase, _ = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po, bipolar_correction=bipolar_correction)
-        savenii(phase, "corrected_phase", writedir, hdr)
-        savenii(angle.(po), "phase_offset", writedir, hdr)
     end
 
     ## Perform unwrapping
@@ -159,6 +143,26 @@ function unwrapping_main(args)
         end
         B0 = MriResearchTools.calculateB0_unwrapped(phase, keyargs[:mag], keyargs[:TEs])
         savenii(B0, "B0", writedir, hdr)
+    end
+
+    # no mask defined for writing quality maps
+    if settings["write-quality"]
+        settings["verbose"] && println("Calculate and write quality map...")
+        weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs...)
+        savenii(getvoxelquality(weights), "quality", writedir, hdr)
+    end
+    if settings["write-quality-all"]
+        for i in 1:4
+            flags = falses(4)
+            flags[i] = true
+            settings["verbose"] && println("Calculate and write quality map $i...")
+            weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs..., weights=flags)
+            if all(weights[:,1:end-1,1:end-1,1:end-1] .== 1.0)
+                settings["verbose"] && println("quality map $i skipped for the given inputs")
+            else
+                savenii(getvoxelquality(weights), "quality_$i", writedir, hdr)
+            end
+        end
     end
 
     return 0
