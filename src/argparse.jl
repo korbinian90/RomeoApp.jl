@@ -52,8 +52,9 @@ function getargs(args)
         "--phase-offset-correction"
             help = """on | off | bipolar.
                 Applies the MCPC3Ds method to perform phase offset
-                determination and removal (for multi-echo). 'bipolar' also 
-                removes eddy current artefacts (requires >= 3 echoes)"""
+                determination and removal (for multi-echo). This option also
+                allows 5D input, where the 5th dimension is channels. "bipolar"
+                removes eddy current artefacts (requires >= 3 echoes)."""
             default = "off"
             nargs = '?'
             constant = "on"

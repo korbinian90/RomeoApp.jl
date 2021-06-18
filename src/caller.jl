@@ -1,5 +1,6 @@
 function unwrapping_main(args)
     settings = getargs(args)
+    keyargs = Dict()
     
     writedir = settings["output"]
     filename = "unwrapped"
@@ -23,10 +24,30 @@ function unwrapping_main(args)
     mkpath(writedir)
     saveconfiguration(writedir, settings, args)
 
-    phasenii = readphase(settings["phase"], mmap=!settings["no-mmap"], rescale=!settings["no-rescale"])
-    hdr = header(phasenii)
-    neco = size(phasenii, 4)
+    phase = readphase(settings["phase"], mmap=!settings["no-mmap"], rescale=!settings["no-rescale"])
+    hdr = header(phase)
+    neco = size(phase, 4)
 
+    ## Perform phase offset correction
+    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
+        TEs = getTEs(settings, neco, :)
+        if neco != length(TEs) && all(TEs .== 1) error("Phase offset determination requires all echo times!") end
+        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
+        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
+        
+        po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,size(phase,5)))
+        mag = if !isnothing(settings["magnitude"]) readmag(settings["magnitude"], mmap=!settings["no-mmap"]) else ones(size(phase)) end # TODO trues instead ones?
+        bipolar_correction = settings["phase-offset-correction"] == "bipolar"
+        phase, mcomb = mcpc3ds(phase, mag; TEs=TEs, po=po, bipolar_correction=bipolar_correction)
+        if size(mag, 5) != 1
+            keyargs[:mag] = mcomb
+        end
+        settings["verbose"] && println("Saving corrected_phase and phase_offset")
+        savenii(phase, "corrected_phase", writedir, hdr)
+        settings["verbose"] && savenii(angle.(po), "phase_offset", writedir, hdr)
+    end
+
+    ## Echoes for unwrapping
     echoes = try
         getechoes(settings, neco)
     catch y
@@ -38,21 +59,6 @@ function unwrapping_main(args)
     end
     settings["verbose"] && println("Echoes are $echoes")
 
-    phase = phasenii[:,:,:,echoes,:]
-    phasenii = nothing
-    settings["verbose"] && println("Phase loaded!")
-
-    keyargs = Dict()
-    if !isnothing(settings["magnitude"])
-        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes,:) # why view?
-        if size(keyargs[:mag]) != size(phase)
-            error("size of magnitude and phase does not match!")
-        end
-        settings["verbose"] && println("Magnitude loaded!")
-    end
-
-    keyargs[:correctglobal] = settings["correct-global"]
-    keyargs[:weights] = parseweights(settings)
     if length(echoes) > 1
         keyargs[:TEs] = getTEs(settings, neco, echoes)
         settings["verbose"] && println("TEs are $(keyargs[:TEs])")
@@ -62,26 +68,20 @@ function unwrapping_main(args)
     if 1 < length(echoes) && length(echoes) != length(keyargs[:TEs])
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(keyargs[:TEs])) TEs were specified!")
     end
+    
+    phase = phase[:,:,:,echoes]
+    settings["verbose"] && println("Phase loaded!")
 
-    ## Perform phase offset correction
-    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
-        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
-        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
-        if all(keyargs[:TEs] .== 1)
-            error("Phase offset determination requires the echo times!")
+    if !isnothing(settings["magnitude"]) && !haskey(keyargs, :mag)
+        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes) # view avoids copy
+        if size(keyargs[:mag]) != size(phase)
+            error("size of magnitude and phase does not match!")
         end
-        po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,1))
-        mag = if haskey(keyargs, :mag) keyargs[:mag] else ones(size(phase)) end # TODO trues instead ones?
-        bipolar_correction = settings["phase-offset-correction"] == "bipolar"
-        phase, mcomb = mcpc3ds(phase, mag; TEs=keyargs[:TEs], po=po, bipolar_correction=bipolar_correction)
-        if size(mag, 5) != 1
-            keyargs[:mag] = mcomb
-        end
-        settings["verbose"] && println("Saving corrected_phase and phase_offset")
-        savenii(phase, "corrected_phase", writedir, hdr)
-        settings["verbose"] && savenii(angle.(po), "phase_offset", writedir, hdr)
+        settings["verbose"] && println("Magnitude loaded!")
     end
 
+    keyargs[:correctglobal] = settings["correct-global"]
+    keyargs[:weights] = parseweights(settings)
     keyargs[:maxseeds] = settings["max-seeds"]
     settings["verbose"] && keyargs[:maxseeds] != 1 && println("Maxseeds are $(keyargs[:maxseeds])")
     keyargs[:merge_regions] = settings["merge-regions"]

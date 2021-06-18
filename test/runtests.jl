@@ -20,6 +20,11 @@ savenii(niread(magfile)[:,:,:,1], magfile_1eco)
 savenii(niread(phasefile)[:,:,:,[1]], phasefile_1arreco)
 savenii(niread(magfile)[:,:,:,[1]], magfile_1arreco)
 
+phasefile_5D = joinpath(tmpdir, "phase_multi_channel.nii")
+magfile_5D = joinpath(tmpdir, "mag_multi_channel.nii")
+savenii(repeat(niread(phasefile),1,1,1,1,2), phasefile_5D)
+savenii(repeat(niread(magfile),1,1,1,1,2), magfile_5D)
+
 function test_romeo(args)
     folder = tempname()
     args = [args..., "-o", folder, "-v"]
@@ -76,6 +81,9 @@ for (pf, mf) in files, args in configurations(pf, mf)
     test_romeo(args)
 end
 for args in configurations_me(phasefile, magfile)
+    test_romeo(args)
+end
+for args in configurations_me(phasefile_5D, magfile_5D)[end-1:end]
     test_romeo(args)
 end
 test_romeo([phasefile_nan])
