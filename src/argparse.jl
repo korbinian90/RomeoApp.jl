@@ -1,4 +1,4 @@
-function getargs(args)
+function getargs(args::AbstractVector)
     if isempty(args)
         args = ["--help"]
     else
