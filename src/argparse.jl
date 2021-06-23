@@ -14,7 +14,7 @@ function getargs(args::AbstractVector)
         )
     @add_arg_table! s begin
         "--phase", "-p"
-            help = "The phase image used for unwrapping"
+            help = "The phase image that should be unwrapped"
         "--magnitude", "-m"
             help = "The magnitude image (better unwrapping if specified)"
         "--output", "-o"
