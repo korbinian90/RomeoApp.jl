@@ -59,10 +59,8 @@ function unwrapping_main(args)
     end
     settings["verbose"] && println("Echoes are $echoes")
 
-    if length(echoes) > 1
-        keyargs[:TEs] = getTEs(settings, neco, echoes)
-        settings["verbose"] && println("TEs are $(keyargs[:TEs])")
-    end
+    keyargs[:TEs] = getTEs(settings, neco, echoes)
+    settings["verbose"] && println("TEs are $(keyargs[:TEs])")
 
     ## Error messages
     if 1 < length(echoes) && length(echoes) != length(keyargs[:TEs])
@@ -143,11 +141,13 @@ function unwrapping_main(args)
     savenii(phase, filename, writedir, hdr)
 
     if settings["compute-B0"]
-        if isnothing(settings["echo-times"])
+        if isempty(settings["echo-times"])
             error("echo times are required for B0 calculation! Unwrapping has been performed")
         end
         if !haskey(keyargs, :mag)
-            @warn "B0 frequency estimation without magnitude might result in poor handling of noise in later echoes!"        
+            if length(keyargs[:TEs]) > 1
+                @warn "B0 frequency estimation without magnitude might result in poor handling of noise in later echoes!"
+            end
             keyargs[:mag] = to_dim(exp.(-keyargs[:TEs]/20), 4) # T2*=20ms decay (low value to reduce noise problems in later echoes)
         end
         B0 = calculateB0_unwrapped(phase, keyargs[:mag], keyargs[:TEs])

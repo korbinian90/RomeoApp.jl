@@ -87,6 +87,12 @@ end
 for args in configurations_me(phasefile_5D, magfile_5D)[end-1:end]
     test_romeo(args)
 end
+files_se = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco)]
+for (pf, mf) in files_se
+    b_args = ["-B", "-t", "3.06"]
+    test_romeo(["-p", pf, b_args...])
+    test_romeo(["-p", pf, "-m", mf, b_args...])
+end
 test_romeo([phasefile_nan])
 
 ## test no-rescale
