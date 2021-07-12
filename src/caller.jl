@@ -17,8 +17,8 @@ function unwrapping_main(args)
         end
     end
 
-    if settings["mask-unwrapped"] && settings["mask"] == "nomask"
-        settings["mask"] = "robustmask"
+    if settings["mask-unwrapped"] && settings["mask"][1] == "nomask"
+        settings["mask"][1] = "robustmask"
     end
 
     mkpath(writedir)
@@ -96,17 +96,26 @@ function unwrapping_main(args)
     settings["verbose"] && println("echo $(keyargs[:template]) used as template")
 
     ## set mask
-    if isfile(settings["mask"])
+    if isfile(settings["mask"][1])
         settings["verbose"] && println("Trying to read mask from file $(settings["mask"])")
         keyargs[:mask] = niread(settings["mask"]).raw .!= 0
         if size(keyargs[:mask]) != size(phase)[1:3]
             error("size of mask is $(size(keyargs[:mask])), but it should be $(size(phase)[1:3])!")
         end
-    elseif settings["mask"] == "robustmask" && haskey(keyargs, :mag)
+    elseif settings["mask"][1] == "robustmask" && haskey(keyargs, :mag)
         settings["verbose"] && println("Calculate robustmask from magnitude, saved as mask.nii")
         mag = keyargs[:mag]
         template_echo = min(keyargs[:template], size(mag, 4))
         keyargs[:mask] = robustmask(mag[:,:,:,template_echo])
+        savenii(keyargs[:mask], "mask", writedir, hdr)
+    elseif settings["mask"][1] == "qualitymask"
+        threshold = if length(settings["mask"]) > 1
+            settings["mask"][2]
+        else
+            0.5 # default threshold
+        end
+        qmap = romeovoxelquality(phase; keyargs...)
+        keyargs[:mask] = mask_from_voxelquality(qmap, threshold)
         savenii(keyargs[:mask], "mask", writedir, hdr)
     end
 
@@ -141,42 +150,30 @@ function unwrapping_main(args)
             @warn "B0 frequency estimation without magnitude might result in poor handling of noise in later echoes!"        
             keyargs[:mag] = to_dim(exp.(-keyargs[:TEs]/20), 4) # T2*=20ms decay (low value to reduce noise problems in later echoes)
         end
-        B0 = MriResearchTools.calculateB0_unwrapped(phase, keyargs[:mag], keyargs[:TEs])
+        B0 = calculateB0_unwrapped(phase, keyargs[:mag], keyargs[:TEs])
         savenii(B0, "B0", writedir, hdr)
     end
 
-    # no mask defined for writing quality maps
+    # no mask used for writing quality maps
     if settings["write-quality"]
         settings["verbose"] && println("Calculate and write quality map...")
-        weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs...)
-        savenii(getvoxelquality(weights), "quality", writedir, hdr)
+        savenii(romeovoxelquality(phase; keyargs...), "quality", writedir, hdr)
     end
     if settings["write-quality-all"]
         for i in 1:4
             flags = falses(4)
             flags[i] = true
             settings["verbose"] && println("Calculate and write quality map $i...")
-            weights = ROMEO.calculateweights(phase; type=Float32, rescale=x->x, keyargs..., weights=flags)
-            if all(weights[:,1:end-1,1:end-1,1:end-1] .== 1.0)
+            voxelquality = romeovoxelquality(phase; keyargs..., weights=flags)
+            if all(voxelquality[1:end-1,1:end-1,1:end-1] .== 1.0)
+                @show "all"
                 settings["verbose"] && println("quality map $i skipped for the given inputs")
             else
-                savenii(getvoxelquality(weights), "quality_$i", writedir, hdr)
+                @show "save"
+                savenii(voxelquality, "quality_$i", writedir, hdr)
             end
         end
     end
 
     return 0
 end
-
-function ROMEO.calculateweights(phase::AbstractArray{T,4}; TEs, template=2, p2ref=1, keyargs...) where T
-    args = Dict{Symbol, Any}(keyargs)
-    args[:phase2] = phase[:,:,:,p2ref]
-    args[:TEs] = TEs[[template, p2ref]]
-    if haskey(args, :mag)
-        args[:mag] = args[:mag][:,:,:,template]
-    end
-    return ROMEO.calculateweights(view(phase,:,:,:,template); args...)
-    
-end
-
-getvoxelquality(w::AbstractArray{<:AbstractFloat}) = dropdims(sum(w; dims=1); dims=1) ./ 3

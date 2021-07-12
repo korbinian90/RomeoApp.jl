@@ -27,8 +27,9 @@ function getargs(args::AbstractVector)
                 multiple volumes with the same time)"""
             nargs = '+'
         "--mask", "-k"
-            help = "nomask | robustmask | <mask_file>"
-            default = "robustmask"
+            help = "nomask | qualitymask | robustmask | <mask_file>"
+            default = ["robustmask"]
+            nargs = '+'
         "--mask-unwrapped", "-u"
             help = """Apply the mask on the unwrapped result. If mask is 
                 "nomask", sets it to "robustmask"."""

@@ -58,6 +58,7 @@ configurations(pm) = [
     [pm..., "--wrap-addition", "0.1"],
     [pm..., "-k", "robustmask"],
     [pm..., "-k", "nomask"],
+    [pm..., "-k", "qualitymask"],
 ]
 configurations_me(phasefile, magfile) = vcat(configurations_me.([[phasefile], [phasefile, "-m", magfile]])...)
 configurations_me(pm) = [
