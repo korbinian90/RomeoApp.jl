@@ -91,7 +91,7 @@ function unwrapping_main(args)
     keyargs[:individual] = settings["individual-unwrapping"]
     settings["verbose"] && println("individual unwrapping is $(keyargs[:individual])")
     keyargs[:template] = settings["template"]
-    settings["verbose"] && println("echo $(keyargs[:template]) used as template")
+    settings["verbose"] && !settings["individual-unwrapping"] && println("echo $(keyargs[:template]) used as template")
 
     ## set mask
     if isfile(settings["mask"][1])
