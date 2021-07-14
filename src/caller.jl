@@ -22,8 +22,8 @@ function unwrapping_main(args)
     end
 
     if settings["mask"][1] == "robustmask" && !haskey(keyargs, :mag)
-        settings["mask"][1] = "qualitymask"
-        @warn "robustmask was chosen but no magnitude is available. The mask is changed to qualitymask!"
+        settings["mask"][1] = "nomask"
+        @warn "robustmask was chosen but no magnitude is available. No mask is used!"
     end
 
     mkpath(writedir)
