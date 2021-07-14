@@ -119,8 +119,8 @@ function unwrapping_main(args)
 
     ## Perform unwrapping
     settings["verbose"] && println("perform unwrapping...")
-    regions=zeros(UInt8, size(phase)[1:3])
-    unwrap!(phase; regions=regions, keyargs...)
+    regions=zeros(UInt8, size(phase)[1:3]) # regions is an output
+    unwrap!(phase; keyargs..., regions)
     settings["verbose"] && println("unwrapping finished!")
 
     if settings["max-seeds"] > 1
