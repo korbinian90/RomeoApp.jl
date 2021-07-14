@@ -21,6 +21,11 @@ function unwrapping_main(args)
         settings["mask"][1] = "robustmask"
     end
 
+    if settings["mask"][1] == "robustmask" && !haskey(keyargs, :mag)
+        settings["mask"][1] = "qualitymask"
+        @warn "robustmask was chosen but no magnitude is available. The mask is changed to qualitymask!"
+    end
+
     mkpath(writedir)
     saveconfiguration(writedir, settings, args)
 
@@ -166,10 +171,8 @@ function unwrapping_main(args)
             settings["verbose"] && println("Calculate and write quality map $i...")
             voxelquality = romeovoxelquality(phase; keyargs..., weights=flags)
             if all(voxelquality[1:end-1,1:end-1,1:end-1] .== 1.0)
-                @show "all"
                 settings["verbose"] && println("quality map $i skipped for the given inputs")
             else
-                @show "save"
                 savenii(voxelquality, "quality_$i", writedir, hdr)
             end
         end
