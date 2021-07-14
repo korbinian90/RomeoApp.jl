@@ -21,10 +21,11 @@ function getargs(args::AbstractVector)
             help = "The output path or filename"
             default = "unwrapped.nii"
         "--echo-times", "-t"
-            help = """The relative echo times required for temporal unwrapping 
+            help = """The echo times required for temporal unwrapping 
                 specified in array or range syntax (eg. "[1.5,3.0]" or 
-                "3.5:3.5:14"). (default is ones(<nr_of_time_points>) for 
-                multiple volumes with the same time)"""
+                "3.5:3.5:14"). For identical echo times, "-t epi" can be
+                used with the possibility to specify the echo time as
+                e.g. "-t epi 5.3" (for B0 calculation)."""
             nargs = '+'
         "--mask", "-k"
             help = "nomask | qualitymask | robustmask | <mask_file>"
@@ -135,8 +136,7 @@ end
 function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
     if err == ArgParseError("too many arguments")
         println(stderr,
-            """Wrong argument formatting!
-            Maybe there are unsupported spaces"""
+            """wrong argument formatting!"""
         )
     end
     ArgParse.default_handler(settings, err, err_code)
@@ -155,11 +155,18 @@ function getechoes(settings, neco)
 end
 
 function getTEs(settings, neco, echoes)
-    TEs = if !isempty(settings["echo-times"])
-            eval(Meta.parse(join(settings["echo-times"], " ")))
+    if isempty(settings["echo-times"])
+        if neco == 1 || length(echoes) == 1
+            return 1
         else
-            ones(neco)
-        end 
+            error("multi-echo data is used, but no echo times are given. Please specify the echo times using the -t option.")
+        end
+    end
+    TEs = if settings["echo-times"][1] == "epi"
+        ones(neco) .* if length(settings["echo-times"]) > 1; parse(Float64, settings["echo-times"][2]) else 1 end
+    else
+        eval(Meta.parse(join(settings["echo-times"], " ")))
+    end
     if TEs isa Matrix
         TEs = TEs[:]
     end
