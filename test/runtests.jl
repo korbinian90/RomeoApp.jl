@@ -11,13 +11,13 @@ phasefile_me = joinpath(p, "Phase.nii")
 phasefile_me_nan = joinpath(p, "phase_with_nan.nii")
 magfile_me = joinpath(p, "Mag.nii")
 tmpdir = mktempdir()
-phasefile_me_1eco = joinpath(tmpdir, "Phase.nii")
+phasefile_1eco = joinpath(tmpdir, "Phase.nii")
 magfile_1eco = joinpath(tmpdir, "Mag.nii")
-phasefile_me_1arreco = joinpath(tmpdir, "Phase.nii")
+phasefile_1arreco = joinpath(tmpdir, "Phase.nii")
 magfile_1arreco = joinpath(tmpdir, "Mag.nii")
-savenii(niread(phasefile_me)[:,:,:,1], phasefile_me_1eco)
+savenii(niread(phasefile_me)[:,:,:,1], phasefile_1eco)
 savenii(niread(magfile_me)[:,:,:,1], magfile_1eco)
-savenii(niread(phasefile_me)[:,:,:,[1]], phasefile_me_1arreco)
+savenii(niread(phasefile_me)[:,:,:,[1]], phasefile_1arreco)
 savenii(niread(magfile_me)[:,:,:,[1]], magfile_1arreco)
 
 phasefile_me_5D = joinpath(tmpdir, "phase_multi_channel.nii")
@@ -79,7 +79,7 @@ configurations_me(pm) = [
     [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]"],
 ]
 # TODO if no mag is given set default mask to qualitymask
-files = [(phasefile_me_1eco, magfile_1eco), (phasefile_me_1arreco, magfile_1arreco), (phasefile_me_1eco, magfile_1arreco), (phasefile_me_1arreco, magfile_1eco)]
+files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
 for (pf, mf) in files, args in configurations_se(pf, mf)
     test_romeo(args)
 end
@@ -89,7 +89,7 @@ end
 for args in configurations_me(phasefile_me_5D, magfile_5D)[end-1:end]
     test_romeo(args)
 end
-files_se = [(phasefile_me_1eco, magfile_1eco), (phasefile_me_1arreco, magfile_1arreco)]
+files_se = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco)]
 for (pf, mf) in files_se
     b_args = ["-B", "-t", "3.06"]
     test_romeo(["-p", pf, b_args...])
@@ -99,6 +99,10 @@ end
 test_romeo([phasefile_me_nan, "-t", "[2,4]", "-k", "nomask"])
 m = "multi-echo data is used, but no echo times are given. Please specify the echo times using the -t option."
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v"])
+m = "masking option '0.8' is undefined (Maybe '-k qualitymask 0.8' was meant?)"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-v", "-k", "0.8"])
+m = "masking option 'blub' is undefined"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-v", "-k", "blub"])
 
 ## test no-rescale
 readphase = RomeoApp.readphase

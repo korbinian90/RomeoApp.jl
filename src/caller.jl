@@ -120,6 +120,9 @@ function unwrapping_main(args)
         qmap = romeovoxelquality(phase; keyargs...)
         keyargs[:mask] = mask_from_voxelquality(qmap, threshold)
         savenii(keyargs[:mask], "mask", writedir, hdr)
+    elseif settings["mask"][1] != "nomask"
+        opt = settings["mask"][1]
+        error("masking option '$opt' is undefined" * ifelse(tryparse(Float32, opt) isa Float32, " (Maybe '-k qualitymask $opt' was meant?)", ""))
     end
 
     ## Perform unwrapping
