@@ -11,5 +11,5 @@ ROMEO = "1ea8258b-a15d-4adb-ad20-01632f467a84"
 [compat]
 ArgParse = "1"
 MriResearchTools = "0.5.2"
-ROMEO = "0.2.4"
+ROMEO = "0.2.5"
 julia = "1.5"
