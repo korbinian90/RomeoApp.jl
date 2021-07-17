@@ -28,7 +28,8 @@ function getargs(args::AbstractVector)
                 e.g. "-t epi 5.3" (for B0 calculation)."""
             nargs = '+'
         "--mask", "-k"
-            help = "nomask | qualitymask | robustmask | <mask_file>"
+            help = """nomask | qualitymask <threshold> | robustmask | <mask_file>.
+                <threshold> for qualitymask in [0;1]"""
             default = ["robustmask"]
             nargs = '+'
         "--mask-unwrapped", "-u"
