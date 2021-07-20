@@ -21,7 +21,7 @@ function unwrapping_main(args)
         settings["mask"][1] = "robustmask"
     end
 
-    if settings["mask"][1] == "robustmask" && !haskey(keyargs, :mag)
+    if settings["mask"][1] == "robustmask" && isnothing(settings["magnitude"])
         settings["mask"][1] = "nomask"
         @warn "robustmask was chosen but no magnitude is available. No mask is used!"
     end
