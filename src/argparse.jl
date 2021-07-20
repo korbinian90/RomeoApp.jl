@@ -10,7 +10,7 @@ function getargs(args::AbstractVector)
     s = ArgParseSettings(
         exc_handler=exception_handler,
         add_version=true,
-        version="v3.2.1",
+        version="v3.2.2",
         )
     @add_arg_table! s begin
         "--phase", "-p"
@@ -52,12 +52,13 @@ function getargs(args::AbstractVector)
                 correction might be necessary if not coil-combined with
                 MCPC3Ds/ASPIRE."""
             action = :store_true
-        "--phase-offset-correction"
+        "--phase-offset-correction", "--coil-combination"
             help = """on | off | bipolar.
                 Applies the MCPC3Ds method to perform phase offset
                 determination and removal (for multi-echo). This option also
-                allows 5D input, where the 5th dimension is channels. "bipolar"
-                removes eddy current artefacts (requires >= 3 echoes)."""
+                allows 5D input, where the 5th dimension is channels. Coil
+                combination will be performed. "bipolar" removes eddy current
+                artefacts (requires >= 3 echoes)."""
             default = "off"
             nargs = '?'
             constant = "on"

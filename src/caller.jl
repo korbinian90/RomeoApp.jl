@@ -36,20 +36,23 @@ function unwrapping_main(args)
     ## Perform phase offset correction
     if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
         TEs = getTEs(settings, neco, :)
-        if neco != length(TEs) && all(TEs .== 1) error("Phase offset determination requires all echo times!") end
+        if neco != length(TEs) error("Phase offset determination requires all echo times!") end
+        if TEs[1] == TEs[2] error("The echo times need to be different for MCPC3D-S phase offset correction!") end
         polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
         settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
         
         po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,size(phase,5)))
         mag = if !isnothing(settings["magnitude"]) readmag(settings["magnitude"], mmap=!settings["no-mmap"]) else ones(size(phase)) end # TODO trues instead ones?
         bipolar_correction = settings["phase-offset-correction"] == "bipolar"
-        phase, mcomb = mcpc3ds(phase, mag; TEs=TEs, po=po, bipolar_correction=bipolar_correction)
+        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction)
         if size(mag, 5) != 1
             keyargs[:mag] = mcomb
         end
         settings["verbose"] && println("Saving corrected_phase and phase_offset")
         savenii(phase, "corrected_phase", writedir, hdr)
         settings["verbose"] && savenii(angle.(po), "phase_offset", writedir, hdr)
+    else
+        if size(phase, 5) > 1 error("5D phase is given but no coil combination is selected") end
     end
 
     ## Echoes for unwrapping
@@ -57,9 +60,9 @@ function unwrapping_main(args)
         getechoes(settings, neco)
     catch y
         if isa(y, BoundsError)
-            error("echoes=$(settings["unwrap-echoes"]): specified echo out of range! Number of echoes is $neco")
+            error("echoes=$(join(settings["unwrap-echoes"], " ")): specified echo out of range! Number of echoes is $neco")
         else
-            error("echoes=$(settings["unwrap-echoes"]) wrongly formatted!")
+            error("echoes=$(join(settings["unwrap-echoes"], " ")) wrongly formatted!")
         end
     end
     settings["verbose"] && println("Echoes are $echoes")
@@ -76,10 +79,11 @@ function unwrapping_main(args)
     settings["verbose"] && println("Phase loaded!")
 
     if !isnothing(settings["magnitude"]) && !haskey(keyargs, :mag)
-        keyargs[:mag] = view(readmag(settings["magnitude"], mmap=!settings["no-mmap"]),:,:,:,echoes) # view avoids copy
-        if size(keyargs[:mag]) != size(phase)
+        magnii = readmag(settings["magnitude"], mmap=!settings["no-mmap"])
+        if size(magnii)[1:3] != size(phase)[1:3] || size(magnii, 4) < maximum(echoes)
             error("size of magnitude and phase does not match!")
         end
+        keyargs[:mag] = view(magnii,:,:,:,echoes) # view avoids copy
         settings["verbose"] && println("Magnitude loaded!")
     end
 

@@ -77,6 +77,7 @@ configurations_me(pm) = [
     [pm..., "--template", "3", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]"],
+    [pm..., "--coil-combination", "bipolar", "-t", "[2,4,6]"],
 ]
 # TODO if no mag is given set default mask to qualitymask
 files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
@@ -86,7 +87,7 @@ end
 for args in configurations_me(phasefile_me, magfile_me)
     test_romeo(args)
 end
-for args in configurations_me(phasefile_me_5D, magfile_5D)[end-1:end]
+for args in configurations_me(phasefile_me_5D, magfile_5D)[end-2:end] # test the last 3 configurations_me lines for coil combination
     test_romeo(args)
 end
 files_se = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco)]
@@ -97,12 +98,39 @@ for (pf, mf) in files_se
 end
 
 test_romeo([phasefile_me_nan, "-t", "[2,4]", "-k", "nomask"])
+
+## Test error and warning messages
 m = "multi-echo data is used, but no echo times are given. Please specify the echo times using the -t option."
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v"])
+
 m = "masking option '0.8' is undefined (Maybe '-k qualitymask 0.8' was meant?)"
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-v", "-k", "0.8"])
+
 m = "masking option 'blub' is undefined"
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-v", "-k", "blub"])
+
+m = "Phase offset determination requires all echo times!"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me_5D, "-o", tmpdir, "-v", "-t", "[1,2]", "-e", "[1,2]", "--phase-offset-correction"])
+
+m = "5D phase is given but no coil combination is selected"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me_5D, "-o", tmpdir, "-v", "-t", "[1,2,3]"])
+
+m = "echoes=[1,5]: specified echo out of range! Number of echoes is 3"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v", "-t", "[1,2,3]", "-e", "[1,5]"])
+
+m = "echoes=[1,5} wrongly formatted!"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v", "-t", "[1,2,3]", "-e", "[1,5}"])
+
+m = "Number of chosen echoes is 2 (3 in .nii data), but 5 TEs were specified!"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v", "-t", "[1,2,3,4,5]", "-e", "[1,2]"])
+
+m = "size of magnitude and phase does not match!"
+@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v", "-t", "[1,2,3]", "-m", magfile_1eco])
+
+m = "robustmask was chosen but no magnitude is available. No mask is used!"
+@test_logs (:warn, m) match_mode=:any unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir])
+
+@test_logs unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-m", magfile_1eco]) # test that no warning appears
 
 ## test no-rescale
 readphase = RomeoApp.readphase
