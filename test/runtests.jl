@@ -15,6 +15,8 @@ phasefile_1eco = joinpath(tmpdir, "Phase.nii")
 magfile_1eco = joinpath(tmpdir, "Mag.nii")
 phasefile_1arreco = joinpath(tmpdir, "Phase.nii")
 magfile_1arreco = joinpath(tmpdir, "Mag.nii")
+maskfile = joinpath(tmpdir, "Mask.nii")
+savenii(niread(magfile_me)[:,:,:,1] |> I -> I .> RomeoApp.MriResearchTools.median(I), maskfile)
 savenii(niread(phasefile_me)[:,:,:,1], phasefile_1eco)
 savenii(niread(magfile_me)[:,:,:,1], magfile_1eco)
 savenii(niread(phasefile_me)[:,:,:,[1]], phasefile_1arreco)
@@ -59,6 +61,7 @@ configurations_se(pm) = [
     [pm..., "-k", "robustmask"],
     [pm..., "-k", "nomask"],
     [pm..., "-k", "qualitymask"],
+    [pm..., "-k", maskfile],
 ]
 configurations_me(phasefile_me, magfile_me) = vcat(configurations_me.([[phasefile_me], [phasefile_me, "-m", magfile_me]])...)
 configurations_me(pm) = [
@@ -85,6 +88,9 @@ for (pf, mf) in files, args in configurations_se(pf, mf)
     test_romeo(args)
 end
 for args in configurations_me(phasefile_me, magfile_me)
+    test_romeo(args)
+end
+for args in configurations_se(["-p", phasefile_me, "-m", magfile_me, "-t", "[2,4,6]"])
     test_romeo(args)
 end
 for args in configurations_me(phasefile_me_5D, magfile_5D)[end-2:end] # test the last 3 configurations_me lines for coil combination
