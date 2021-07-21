@@ -61,6 +61,7 @@ configurations_se(pm) = [
     [pm..., "-k", "robustmask"],
     [pm..., "-k", "nomask"],
     [pm..., "-k", "qualitymask"],
+    [pm..., "-k", "qualitymask", "0.8"],
     [pm..., "-k", maskfile],
 ]
 configurations_me(phasefile_me, magfile_me) = vcat(configurations_me.([[phasefile_me], [phasefile_me, "-m", magfile_me]])...)

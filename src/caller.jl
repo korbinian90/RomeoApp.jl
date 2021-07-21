@@ -117,7 +117,7 @@ function unwrapping_main(args)
         savenii(keyargs[:mask], "mask", writedir, hdr)
     elseif settings["mask"][1] == "qualitymask"
         threshold = if length(settings["mask"]) > 1
-            settings["mask"][2]
+            parse(Float32, settings["mask"][2])
         else
             0.5 # default threshold
         end
