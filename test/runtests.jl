@@ -53,6 +53,7 @@ configurations_se(pm) = [
     [pm..., "-w", "romeo"],
     [pm..., "-w", "bestpath"],
     [pm..., "-w", "1010"],
+    [pm..., "-w", "101011"],
     [pm..., "--threshold", "4"],
     [pm..., "-s", "50"],
     [pm..., "-s", "50", "--merge-regions"],

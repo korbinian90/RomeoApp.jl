@@ -41,11 +41,12 @@ function getargs(args::AbstractVector)
             default = [":"]
             nargs = '+'
         "--weights", "-w"
-            help = """romeo | romeo2 | romeo3 | romeo4 | bestpath |
-                <4d-weights-file> | <flags>.
-                <flags> are four bits to activate individual weights
+            help = """romeo | romeo2 | romeo3 | romeo4 | romeo6 |
+                bestpath | <4d-weights-file> | <flags>.
+                <flags> are up to 6 bits to activate individual weights
                 (eg. "1010"). The weights are (1)phasecoherence
-                (2)phasegradientcoherence (3)phaselinearity (4)magcoherence"""
+                (2)phasegradientcoherence (3)phaselinearity (4)magcoherence
+                (5)magweight (6)magweight2"""
             default = "romeo"
         "--compute-B0", "-B"
             help = """Calculate combined B0 map in [Hz]. Phase offset
@@ -185,7 +186,8 @@ function parseweights(settings)
         try
             reform = "Bool[$(join(collect(settings["weights"]), ','))]"
             flags = falses(6)
-            flags[1:4] = eval(Meta.parse(reform))
+            flags_tmp = eval(Meta.parse(reform))
+            flags[1:length(flags_tmp)] = flags_tmp 
             return flags
         catch
             return Symbol(settings["weights"])
