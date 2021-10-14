@@ -172,8 +172,8 @@ function unwrapping_main(args)
         savenii(romeovoxelquality(phase; keyargs...), "quality", writedir, hdr)
     end
     if settings["write-quality-all"]
-        for i in 1:4
-            flags = falses(4)
+        for i in 1:6
+            flags = falses(6)
             flags[i] = true
             settings["verbose"] && println("Calculate and write quality map $i...")
             voxelquality = romeovoxelquality(phase; keyargs..., weights=flags)

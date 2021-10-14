@@ -29,7 +29,7 @@ savenii(repeat(niread(magfile_me),1,1,1,1,2), magfile_5D)
 
 function test_romeo(args)
     folder = tempname()
-    args = [args..., "-o", folder, "-v"]
+    args = [args..., "-o", folder]
     try
         msg = unwrapping_main(args)
         @test msg == 0
