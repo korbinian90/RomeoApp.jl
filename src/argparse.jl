@@ -7,10 +7,10 @@ function getargs(args::AbstractVector)
             insert!(args, length(args), "-p")
         end
     end
-    s = ArgParseSettings(
+    s = ArgParseSettings(;
         exc_handler=exception_handler,
         add_version=true,
-        version="v3.2.5",
+        version = "v$(Pkg.project().version)",
         )
     @add_arg_table! s begin
         "--phase", "-p"

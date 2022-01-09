@@ -3,6 +3,7 @@ module RomeoApp
 using ArgParse
 using MriResearchTools
 using ROMEO
+import Pkg
 
 include("argparse.jl")
 include("caller.jl")
