@@ -34,7 +34,7 @@ function unwrapping_main(args)
     neco = size(phase, 4)
 
     ## Perform phase offset correction
-    if settings["phase-offset-correction"] in [nothing, "on", "monopolar", "bipolar"]
+    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
         TEs = getTEs(settings, neco, :)
         if neco != length(TEs) error("Phase offset determination requires all echo times!") end
         if TEs[1] == TEs[2] error("The echo times need to be different for MCPC3D-S phase offset correction!") end
