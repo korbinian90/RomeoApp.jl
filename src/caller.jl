@@ -41,7 +41,7 @@ function unwrapping_main(args)
         polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
         settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
         
-        po = zeros(Complex{eltype(phase)}, (size(phase)[1:3]...,size(phase,5)))
+        po = zeros(eltype(phase), (size(phase)[1:3]...,size(phase,5)))
         mag = if !isnothing(settings["magnitude"]) readmag(settings["magnitude"], mmap=!settings["no-mmap"]) else ones(size(phase)) end # TODO trues instead ones?
         bipolar_correction = settings["phase-offset-correction"] == "bipolar"
         phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction)
@@ -50,7 +50,7 @@ function unwrapping_main(args)
         end
         settings["verbose"] && println("Saving corrected_phase and phase_offset")
         savenii(phase, "corrected_phase", writedir, hdr)
-        settings["verbose"] && savenii(angle.(po), "phase_offset", writedir, hdr)
+        settings["verbose"] && savenii(po, "phase_offset", writedir, hdr)
     else
         if size(phase, 5) > 1 error("5D phase is given but no coil combination is selected") end
     end
