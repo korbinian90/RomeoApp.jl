@@ -34,7 +34,7 @@ function unwrapping_main(args)
     neco = size(phase, 4)
 
     ## Perform phase offset correction
-    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
+    if settings["phase-offset-correction"] in [nothing, "on", "monopolar", "bipolar"]
         TEs = getTEs(settings, neco, :)
         if neco != length(TEs) error("Phase offset determination requires all echo times!") end
         if TEs[1] == TEs[2] error("The echo times need to be different for MCPC3D-S phase offset correction!") end
@@ -50,7 +50,7 @@ function unwrapping_main(args)
         end
         settings["verbose"] && println("Saving corrected_phase and phase_offset")
         savenii(phase, "corrected_phase", writedir, hdr)
-        settings["verbose"] && savenii(po, "phase_offset", writedir, hdr)
+        settings["write-phase-offsets"] && savenii(po, "phase_offset", writedir, hdr)
     else
         if size(phase, 5) > 1 error("5D phase is given but no coil combination is selected") end
     end

@@ -62,7 +62,9 @@ function getargs(args::AbstractVector)
                 artefacts (requires >= 3 echoes)."""
             default = "off"
             nargs = '?'
-            constant = "on"
+        "--write-phase-offsets"
+            help = "Saves the estimated phase offsets to the output folder"
+            action = :store_true
         "--individual-unwrapping", "-i"
             help = """Unwraps the echoes individually (not temporal).
                 This might be necessary if there is large movement
