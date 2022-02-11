@@ -1,5 +1,7 @@
 function unwrapping_main(args)
-    settings = getargs(args)
+    version = "3.2.8"
+
+    settings = getargs(args, version)
     keyargs = Dict()
     
     writedir = settings["output"]
@@ -27,7 +29,7 @@ function unwrapping_main(args)
     end
 
     mkpath(writedir)
-    saveconfiguration(writedir, settings, args)
+    saveconfiguration(writedir, settings, args, version)
 
     phase = readphase(settings["phase"], mmap=!settings["no-mmap"], rescale=!settings["no-rescale"])
     hdr = header(phase)

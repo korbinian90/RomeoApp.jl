@@ -1,4 +1,4 @@
-function getargs(args::AbstractVector)
+function getargs(args::AbstractVector, version)
     if isempty(args)
         args = ["--help"]
     else
@@ -10,7 +10,7 @@ function getargs(args::AbstractVector)
     s = ArgParseSettings(;
         exc_handler=exception_handler,
         add_version=true,
-        version = "v$(Pkg.project().version)",
+        version = "v$version",
         )
     @add_arg_table! s begin
         "--phase", "-p"
@@ -198,7 +198,7 @@ function parseweights(settings)
     end
 end
 
-function saveconfiguration(writedir, settings, args)
+function saveconfiguration(writedir, settings, args, version)
     writedir = abspath(writedir)
     open(joinpath(writedir, "settings_romeo.txt"), "w") do io
         for (fname, val) in settings
@@ -207,5 +207,6 @@ function saveconfiguration(writedir, settings, args)
             end
         end
         println(io, """Arguments: $(join(args, " "))""")
+        println(io, "RomeoApp version: $version")
     end
 end
