@@ -10,7 +10,7 @@ function getargs(args::AbstractVector, version)
     s = ArgParseSettings(;
         exc_handler=exception_handler,
         add_version=true,
-        version = "v$version",
+        version,
         )
     @add_arg_table! s begin
         "--phase", "-p"
