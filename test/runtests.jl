@@ -83,6 +83,7 @@ configurations_me(pm) = [
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--phase-offset-smoothing-sigma-mm", "[5,8,4]"],
+    [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--write-phase-offsets"],
     [pm..., "--coil-combination", "bipolar", "-t", "[2,4,6]"],
 ]
 # TODO if no mag is given set default mask to qualitymask
