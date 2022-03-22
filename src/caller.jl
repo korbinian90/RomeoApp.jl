@@ -46,7 +46,9 @@ function unwrapping_main(args)
         po = zeros(eltype(phase), (size(phase)[1:3]...,size(phase,5)))
         mag = if !isnothing(settings["magnitude"]) readmag(settings["magnitude"], mmap=!settings["no-mmap"]) else ones(size(phase)) end # TODO trues instead ones?
         bipolar_correction = settings["phase-offset-correction"] == "bipolar"
-        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction)
+        sigma_mm = get_phase_offset_smoothing_sigma(settings)
+        sigma_vox = sigma_mm ./ header(phase).pixdim[2:4]
+        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction, σ=sigma_vox)
         if size(mag, 5) != 1
             keyargs[:mag] = mcomb
         end
@@ -121,7 +123,7 @@ function unwrapping_main(args)
         threshold = if length(settings["mask"]) > 1
             parse(Float32, settings["mask"][2])
         else
-            0.5 # default threshold
+            0.1 # default threshold
         end
         qmap = romeovoxelquality(phase; keyargs...)
         keyargs[:mask] = mask_from_voxelquality(qmap, threshold)

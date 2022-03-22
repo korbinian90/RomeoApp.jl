@@ -62,7 +62,7 @@ configurations_se(pm) = [
     [pm..., "-k", "robustmask"],
     [pm..., "-k", "nomask"],
     [pm..., "-k", "qualitymask"],
-    [pm..., "-k", "qualitymask", "0.8"],
+    [pm..., "-k", "qualitymask", "0.1"],
     [pm..., "-k", maskfile],
 ]
 configurations_me(phasefile_me, magfile_me) = vcat(configurations_me.([[phasefile_me], [phasefile_me, "-m", magfile_me]])...)
@@ -82,6 +82,7 @@ configurations_me(pm) = [
     [pm..., "--template", "3", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]"],
+    [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--phase-offset-smoothing-sigma-mm", "[5,8,4]"],
     [pm..., "--coil-combination", "bipolar", "-t", "[2,4,6]"],
 ]
 # TODO if no mag is given set default mask to qualitymask

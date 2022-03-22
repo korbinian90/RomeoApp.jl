@@ -29,7 +29,7 @@ function getargs(args::AbstractVector, version)
             nargs = '+'
         "--mask", "-k"
             help = """nomask | qualitymask <threshold> | robustmask | <mask_file>.
-                <threshold> for qualitymask in [0;1]"""
+                <threshold>=0.1 for qualitymask in [0;1]"""
             default = ["robustmask"]
             nargs = '+'
         "--mask-unwrapped", "-u"
@@ -63,6 +63,14 @@ function getargs(args::AbstractVector, version)
             default = "off"
             nargs = '?'
             constant = "on"
+        "--phase-offset-smoothing-sigma-mm"
+            help = """default: [7,7,7]
+                Only applied if phase-offset-correction is activated. The given
+                sigma size is divided by the voxel size from the nifti phase
+                file to obtain a smoothing size in voxels. A value of [0,0,0]
+                deactivates phase offset smoothing (not recommended).
+            """
+            nargs = '+'
         "--write-phase-offsets"
             help = "Saves the estimated phase offsets to the output folder"
             action = :store_true
@@ -180,6 +188,13 @@ function getTEs(settings, neco, echoes)
         TEs = TEs[echoes]
     end
     return TEs
+end
+
+function get_phase_offset_smoothing_sigma(settings)
+    if isempty(settings["phase-offset-smoothing-sigma-mm"])
+        return (7,7,7)
+    end
+    return eval(Meta.parse(join(settings["phase-offset-smoothing-sigma-mm"], " ")))[:]
 end
 
 function parseweights(settings)
