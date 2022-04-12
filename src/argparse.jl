@@ -84,7 +84,7 @@ function getargs(args::AbstractVector, version)
             help = """Template echo that is spatially unwrapped and used for
                 temporal unwrapping"""
             arg_type = Int
-            default = 2
+            default = 1
         "--no-mmap", "-N"
             help = """Deactivate memory mapping. Memory mapping might cause
                 problems on network storage"""
