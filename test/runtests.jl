@@ -86,7 +86,7 @@ configurations_me(pm) = [
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--write-phase-offsets"],
     [pm..., "--coil-combination", "bipolar", "-t", "[2,4,6]"],
 ]
-# TODO if no mag is given set default mask to qualitymask
+
 files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
 for (pf, mf) in files, args in configurations_se(pf, mf)
     test_romeo(args)

@@ -49,17 +49,25 @@ function getargs(args::AbstractVector, version)
                 (5)magweight (6)magweight2"""
             default = "romeo"
         "--compute-B0", "-B"
-            help = """Calculate combined B0 map in [Hz]. Phase offset
-                correction might be necessary if not coil-combined with
-                MCPC3Ds/ASPIRE."""
+            help = """Calculate combined B0 map in [Hz].
+                This activates MCPC3Ds phase offset correction (monopolar)
+                for multi-echo data."""
             action = :store_true
-        "--phase-offset-correction", "--coil-combination"
+        "--phase-offset-correction"
             help = """on | off | bipolar.
                 Applies the MCPC3Ds method to perform phase offset
-                determination and removal (for multi-echo). This option also
-                allows 5D input, where the 5th dimension is channels. Coil
-                combination will be performed. "bipolar" removes eddy current
-                artefacts (requires >= 3 echoes)."""
+                determination and removal (for multi-echo).
+                "bipolar" removes eddy current artefacts (requires >= 3 echoes)."""
+            default = "off"
+            nargs = '?'
+            constant = "on"
+        "--coil-combination"
+            help = """on | off | bipolar.
+                Applies MCPC3Ds to perform coil combination (for multi-echo).
+                This option requires the echoes as 4th dimension and the 
+                channels as 5th dimension.
+                "bipolar" removes eddy current artefacts (requires >= 3 echoes).
+                This option overwrites the --phase-offset-correction setting."""
             default = "off"
             nargs = '?'
             constant = "on"
