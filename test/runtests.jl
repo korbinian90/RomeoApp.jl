@@ -84,7 +84,6 @@ configurations_me(pm) = [
     [pm..., "--phase-offset-correction", "bipolar", "-t", "[2,4,6]"],
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--phase-offset-smoothing-sigma-mm", "[5,8,4]"],
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--write-phase-offsets"],
-    [pm..., "--coil-combination", "bipolar", "-t", "[2,4,6]"],
 ]
 
 files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
@@ -122,9 +121,6 @@ m = "masking option 'blub' is undefined"
 m = "Phase offset determination requires all echo times!"
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me_5D, "-o", tmpdir, "-v", "-t", "[1,2]", "-e", "[1,2]", "--phase-offset-correction"])
 
-m = "5D phase is given but no coil combination is selected"
-@test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me_5D, "-o", tmpdir, "-v", "-t", "[1,2,3]"])
-
 m = "echoes=[1,5]: specified echo out of range! Number of echoes is 3"
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me, "-o", tmpdir, "-v", "-t", "[1,2,3]", "-e", "[1,5]"])
 
@@ -154,11 +150,19 @@ unwrapping_main([phasefile_me_uw, "-o", phasefile_me_uw_again, "-t", "[2,4,6]", 
 @test readphase(phasefile_me_uw_again; rescale=false).raw == readphase(phasefile_me_uw; rescale=false).raw
 @test readphase(phasefile_me_uw_wrong; rescale=false).raw != readphase(phasefile_me_uw; rescale=false).raw
 
-## test quality map
+## test mcpc3ds output files
+testpath = joinpath(tmpdir, "test5d")
+unwrapping_main([phasefile_me_5D, "-o", testpath, "-m", magfile_5D, "-t", "[2,4,6]"])
+@test isfile(joinpath(testpath, "combined_mag.nii"))
+@test isfile(joinpath(testpath, "combined_phase.nii"))
 
+testpath = joinpath(tmpdir, "test4d")
+unwrapping_main([phasefile_me, "-o", testpath, "-m", magfile_me, "-t", "[2,4,6]", "--phase-offset-correction"])
+@test isfile(joinpath(testpath, "corrected_phase.nii"))
+
+## test quality map
 unwrapping_main([phasefile_me, "-m", magfile_me, "-o", tmpdir, "-t", "[2,4,6]", "-qQ"])
 fns = joinpath.(tmpdir, ["quality.nii", ("quality_$i.nii" for i in 1:4)...])
-@show fns
 for i in 1:length(fns), j in i+1:length(fns)
     @test niread(fns[i]).raw != niread(fns[j]).raw
 end

@@ -61,16 +61,6 @@ function getargs(args::AbstractVector, version)
             default = "off"
             nargs = '?'
             constant = "on"
-        "--coil-combination"
-            help = """on | off | bipolar.
-                Applies MCPC3Ds to perform coil combination (for multi-echo).
-                This option requires the echoes as 4th dimension and the 
-                channels as 5th dimension.
-                "bipolar" removes eddy current artefacts (requires >= 3 echoes).
-                This option overwrites the --phase-offset-correction setting."""
-            default = "off"
-            nargs = '?'
-            constant = "on"
         "--phase-offset-smoothing-sigma-mm"
             help = """default: [7,7,7]
                 Only applied if phase-offset-correction is activated. The given

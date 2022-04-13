@@ -35,40 +35,34 @@ function unwrapping_main(args)
     hdr = header(phase)
     neco = size(phase, 4)
 
-    ## Determine MCPC3Ds application
-    phase_offset_correction = "off"
-    if settings["compute-B0"] && neco > 1
-        phase_offset_correction = "monopolar"
-    end
-    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"]
-        phase_offset_correction = settings["phase-offset-correction"]
-    end
-    if settings["coil-combination"] in ["on", "monopolar", "bipolar"]
-        phase_offset_correction = settings["coil-combination"]
-    end
-
-    ## Perform phase offset correction
-    if phase_offset_correction in ["on", "monopolar", "bipolar"]
+    ## Perform phase offset correction MCPC3D-S
+    multi_channel = size(phase, 5) > 1
+    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"] || multi_channel
         TEs = getTEs(settings, neco, :)
         if neco != length(TEs) error("Phase offset determination requires all echo times!") end
         if TEs[1] == TEs[2] error("The echo times need to be different for MCPC3D-S phase offset correction!") end
-        polarity = if phase_offset_correction == "bipolar" "bipolar" else "monopolar" end
-        settings["verbose"] && println("perform phase offset correction with MCPC3D-S ($polarity)")
-        
+        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
+        settings["verbose"] && println("Perform phase offset correction with MCPC3D-S ($polarity)")
+        settings["verbose"] && multi_channel && println("Perform coil combination with MCPC3D-S ($polarity)")
+
         po = zeros(eltype(phase), (size(phase)[1:3]...,size(phase,5)))
         mag = if !isnothing(settings["magnitude"]) readmag(settings["magnitude"], mmap=!settings["no-mmap"]) else ones(size(phase)) end # TODO trues instead ones?
-        bipolar_correction = phase_offset_correction == "bipolar"
         sigma_mm = get_phase_offset_smoothing_sigma(settings)
         sigma_vox = sigma_mm ./ header(phase).pixdim[2:4]
-        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction, σ=sigma_vox)
+        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction=polarity=="bipolar", σ=sigma_vox)
+        
         if size(mag, 5) != 1
             keyargs[:mag] = mcomb
         end
-        settings["verbose"] && println("Saving corrected_phase and phase_offset")
-        savenii(phase, "corrected_phase", writedir, hdr)
+        if multi_channel
+            settings["verbose"] && println("Saving combined_phase, combined_mag and phase_offset")
+            savenii(phase, "combined_phase", writedir, hdr)
+            savenii(mcomb, "combined_mag", writedir, hdr)
+        else
+            settings["verbose"] && println("Saving corrected_phase and phase_offset")
+            savenii(phase, "corrected_phase", writedir, hdr)
+        end
         settings["write-phase-offsets"] && savenii(po, "phase_offset", writedir, hdr)
-    else
-        if size(phase, 5) > 1 error("5D phase is given but no coil combination is selected") end
     end
 
     ## Echoes for unwrapping
