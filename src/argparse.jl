@@ -76,8 +76,7 @@ function getargs(args::AbstractVector, version)
                 Only applied if phase-offset-correction is activated. The given
                 sigma size is divided by the voxel size from the nifti phase
                 file to obtain a smoothing size in voxels. A value of [0,0,0]
-                deactivates phase offset smoothing (not recommended).
-            """
+                deactivates phase offset smoothing (not recommended)."""
             nargs = '+'
         "--write-phase-offsets"
             help = "Saves the estimated phase offsets to the output folder"
