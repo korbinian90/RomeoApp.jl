@@ -178,10 +178,10 @@ function getTEs(settings, neco, echoes)
     else
         eval(Meta.parse(join(settings["echo-times"], " ")))
     end
-    if TEs isa Matrix
+    if TEs isa AbstractMatrix
         TEs = TEs[:]
     end
-    if length(TEs) == neco
+    if 1 < length(TEs) == neco
         TEs = TEs[echoes]
     end
     return TEs

@@ -1,5 +1,5 @@
 function unwrapping_main(args)
-    version = "3.2.8"
+    version = @project_version
 
     settings = getargs(args, version)
     keyargs = Dict()
@@ -28,20 +28,33 @@ function unwrapping_main(args)
         @warn "robustmask was chosen but no magnitude is available. No mask is used!"
     end
 
-    mkpath(writedir)
-    saveconfiguration(writedir, settings, args, version)
-
     phase = readphase(settings["phase"], mmap=!settings["no-mmap"], rescale=!settings["no-rescale"])
     hdr = header(phase)
     neco = size(phase, 4)
 
-    ## Perform phase offset correction MCPC3D-S
+    # activate phase-offset-correction as default (monopolar)
     multi_channel = size(phase, 5) > 1
-    if settings["phase-offset-correction"] in ["on", "monopolar", "bipolar"] || multi_channel
+    if (settings["compute-B0"] || multi_channel || settings["phase-offset-correction"] == "on") && settings["phase-offset-correction"] != "bipolar"
+        settings["phase-offset-correction"] = "monopolar"
+        settings["verbose"] && println("Phase offset correction with MCPC3D-S set to monopolar")
+    end
+    if neco == 1
+        settings["phase-offset-correction"] = "off"
+        settings["verbose"] && println("Phase offset correction with MCPC3D-S turned off (only one echo)")
+    end
+
+    mkpath(writedir)
+    saveconfiguration(writedir, settings, args, version)
+
+    ## Perform phase offset correction MCPC3D-S
+    if settings["phase-offset-correction"] in ["monopolar", "bipolar"]
+        polarity = settings["phase-offset-correction"]
+        bipolar_correction = polarity == "bipolar"
+
         TEs = getTEs(settings, neco, :)
         if neco != length(TEs) error("Phase offset determination requires all echo times!") end
         if TEs[1] == TEs[2] error("The echo times need to be different for MCPC3D-S phase offset correction!") end
-        polarity = if settings["phase-offset-correction"] == "bipolar" "bipolar" else "monopolar" end
+        
         settings["verbose"] && println("Perform phase offset correction with MCPC3D-S ($polarity)")
         settings["verbose"] && multi_channel && println("Perform coil combination with MCPC3D-S ($polarity)")
 
@@ -49,7 +62,7 @@ function unwrapping_main(args)
         mag = if !isnothing(settings["magnitude"]) readmag(settings["magnitude"], mmap=!settings["no-mmap"]) else ones(size(phase)) end # TODO trues instead ones?
         sigma_mm = get_phase_offset_smoothing_sigma(settings)
         sigma_vox = sigma_mm ./ header(phase).pixdim[2:4]
-        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction=polarity=="bipolar", σ=sigma_vox)
+        phase, mcomb = mcpc3ds(phase, mag; TEs, po, bipolar_correction, σ=sigma_vox)
         
         if size(mag, 5) != 1
             keyargs[:mag] = mcomb
