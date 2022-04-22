@@ -1,5 +1,5 @@
 function unwrapping_main(args)
-    version = @project_version
+    version = "3.3.3"
 
     settings = getargs(args, version)
     keyargs = Dict()
