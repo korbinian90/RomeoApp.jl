@@ -1,7 +1,7 @@
 name = "RomeoApp"
 uuid = "6ec04266-ba88-41a1-94ab-4aa3de757d7e"
 authors = ["Korbinian Eckstein", "High Field MR Centre", "Medical University Vienna"]
-version = "3.3.3"
+version = "3.3.4"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
@@ -10,6 +10,6 @@ ROMEO = "1ea8258b-a15d-4adb-ad20-01632f467a84"
 
 [compat]
 ArgParse = "1"
-MriResearchTools = "0.7"
+MriResearchTools = "0.7, 0.8"
 ROMEO = "0.3"
 julia = "1.5"
