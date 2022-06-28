@@ -28,6 +28,10 @@ function unwrapping_main(args)
         @warn "robustmask was chosen but no magnitude is available. No mask is used!"
     end
 
+    if last(splitext(settings["phase"])) == ".gz"
+        settings["no-mmap"] = true
+    end
+    
     phase = readphase(settings["phase"], mmap=!settings["no-mmap"], rescale=!settings["no-rescale"])
     hdr = header(phase)
     neco = size(phase, 4)
