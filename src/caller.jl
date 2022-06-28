@@ -34,7 +34,7 @@ function unwrapping_main(args)
 
     # activate phase-offset-correction as default (monopolar)
     multi_channel = size(phase, 5) > 1
-    if (settings["compute-B0"] || multi_channel || settings["phase-offset-correction"] == "on") && settings["phase-offset-correction"] != "bipolar"
+    if (!isempty(settings["compute-B0"]) || multi_channel || settings["phase-offset-correction"] == "on") && settings["phase-offset-correction"] != "bipolar"
         settings["phase-offset-correction"] = "monopolar"
         settings["verbose"] && println("Phase offset correction with MCPC3D-S set to monopolar")
     end
@@ -175,7 +175,7 @@ function unwrapping_main(args)
 
     savenii(phase, filename, writedir, hdr)
 
-    if settings["compute-B0"]
+    if !isempty(settings["compute-B0"])
         if isempty(settings["echo-times"])
             error("echo times are required for B0 calculation! Unwrapping has been performed")
         end
@@ -186,7 +186,7 @@ function unwrapping_main(args)
             keyargs[:mag] = to_dim(exp.(-keyargs[:TEs]/20), 4) # T2*=20ms decay (low value to reduce noise problems in later echoes)
         end
         B0 = calculateB0_unwrapped(phase, keyargs[:mag], keyargs[:TEs])
-        savenii(B0, "B0", writedir, hdr)
+        savenii(B0, settings["compute-B0"], writedir, hdr)
     end
 
     # no mask used for writing quality maps

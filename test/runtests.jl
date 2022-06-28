@@ -160,6 +160,16 @@ testpath = joinpath(tmpdir, "test4d")
 unwrapping_main([phasefile_me, "-o", testpath, "-m", magfile_me, "-t", "[2,4,6]", "--phase-offset-correction"])
 @test isfile(joinpath(testpath, "corrected_phase.nii"))
 
+## test B0 output files
+testpath = joinpath(tmpdir, "testB0_1")
+unwrapping_main([phasefile_me, "-o", testpath, "-m", magfile_me, "-t", "[2,4,6]", "-B"])
+@test isfile(joinpath(testpath, "B0.nii"))
+
+testpath = joinpath(tmpdir, "testB0_2")
+name = "B0_output"
+unwrapping_main([phasefile_me, "-o", testpath, "-m", magfile_me, "-t", "[2,4,6]", "-B", name])
+@test isfile(joinpath(testpath, "$name.nii"))
+
 ## test quality map
 unwrapping_main([phasefile_me, "-m", magfile_me, "-o", tmpdir, "-t", "[2,4,6]", "-qQ"])
 fns = joinpath.(tmpdir, ["quality.nii", ("quality_$i.nii" for i in 1:4)...])

@@ -50,9 +50,12 @@ function getargs(args::AbstractVector, version)
             default = "romeo"
         "--compute-B0", "-B"
             help = """Calculate combined B0 map in [Hz].
+                Supports the B0 output filename as optional input.
                 This activates MCPC3Ds phase offset correction (monopolar)
                 for multi-echo data."""
-            action = :store_true
+            default = ""
+            nargs = '?'
+            constant = "B0"
         "--phase-offset-correction"
             help = """on | off | bipolar.
                 Applies the MCPC3Ds method to perform phase offset
