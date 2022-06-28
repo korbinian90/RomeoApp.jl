@@ -28,7 +28,7 @@ function unwrapping_main(args)
         @warn "robustmask was chosen but no magnitude is available. No mask is used!"
     end
 
-    if last(splitext(settings["phase"])) == ".gz"
+    if endswith(settings["phase"], ".gz") || (!isnothing(settings["magnitude"]) && endswith(settings["magnitude"], ".gz"))
         settings["no-mmap"] = true
     end
     
