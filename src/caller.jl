@@ -6,7 +6,7 @@ function unwrapping_main(args)
     
     writedir = settings["output"]
     filename = "unwrapped"
-    if occursin(r"\.nii$", writedir)
+    if endswith(writedir, ".nii") || endswith(writedir, ".nii.gz")
         filename = basename(writedir)
         writedir = dirname(writedir)
     end
@@ -149,7 +149,7 @@ function unwrapping_main(args)
             0.1 # default threshold
         end
         qmap = romeovoxelquality(phase; keyargs...)
-        keyargs[:mask] = mask_from_voxelquality(qmap, threshold)
+        keyargs[:mask] = robustmask(qmap; threshold)
         savenii(keyargs[:mask], "mask", writedir, hdr)
     elseif settings["mask"][1] != "nomask"
         opt = settings["mask"][1]
