@@ -150,6 +150,21 @@ unwrapping_main([phasefile_me_uw, "-o", phasefile_me_uw_again, "-t", "[2,4,6]", 
 @test readphase(phasefile_me_uw_again; rescale=false).raw == readphase(phasefile_me_uw; rescale=false).raw
 @test readphase(phasefile_me_uw_wrong; rescale=false).raw != readphase(phasefile_me_uw; rescale=false).raw
 
+## test ROMEO output files
+testpath = joinpath(tmpdir, "test_name_1")
+unwrapping_main([phasefile_1eco, "-o", testpath])
+@test isfile(joinpath(testpath, "unwrapped.nii"))
+
+testpath = joinpath(tmpdir, "test_name_2")
+fn = joinpath(testpath, "unwrap_name.nii")
+unwrapping_main([phasefile_1eco, "-o", fn])
+@test isfile(fn)
+
+testpath = joinpath(tmpdir, "test_name_2")
+fn = joinpath(testpath, "unwrap_name.nii.gz")
+unwrapping_main([phasefile_1eco, "-o", fn])
+@test isfile(fn)
+
 ## test mcpc3ds output files
 testpath = joinpath(tmpdir, "test5d")
 unwrapping_main([phasefile_me_5D, "-o", testpath, "-m", magfile_5D, "-t", "[2,4,6]"])
