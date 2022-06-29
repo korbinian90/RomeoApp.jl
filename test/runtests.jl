@@ -118,7 +118,7 @@ m = "masking option '0.8' is undefined (Maybe '-k qualitymask 0.8' was meant?)"
 m = "masking option 'blub' is undefined"
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-v", "-k", "blub"])
 
-m = "Phase offset determination requires all echo times!"
+m = "Phase offset determination requires all echo times! (2 given, 3 required)"
 @test_throws ErrorException(m) unwrapping_main(["-p", phasefile_me_5D, "-o", tmpdir, "-v", "-t", "[1,2]", "-e", "[1,2]", "--phase-offset-correction"])
 
 m = "echoes=[1,5]: specified echo out of range! Number of echoes is 3"
@@ -135,6 +135,9 @@ m = "size of magnitude and phase does not match!"
 
 m = "robustmask was chosen but no magnitude is available. No mask is used!"
 @test_logs (:warn, m) match_mode=:any unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir])
+
+m = "The echo times 1 and 2 ([1.1, 1.1, 1.1]) need to be different for MCPC-3D-S phase offset correction! No phase offset correction performed"
+@test_logs (:warn, m) match_mode=:any unwrapping_main(["-p", phasefile_me, "-m", magfile_me, "-o", tmpdir, "-t", "[1.1, 1.1, 1.1]", "--phase-offset-correction"])
 
 @test_logs unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-m", magfile_1eco]) # test that no warning appears
 
@@ -185,12 +188,17 @@ name = "B0_output"
 unwrapping_main([phasefile_me, "-o", testpath, "-m", magfile_me, "-t", "[2,4,6]", "-B", name])
 @test isfile(joinpath(testpath, "$name.nii"))
 
+## TODO add and test homogeneity corrected output
+
 ## test quality map
 unwrapping_main([phasefile_me, "-m", magfile_me, "-o", tmpdir, "-t", "[2,4,6]", "-qQ"])
 fns = joinpath.(tmpdir, ["quality.nii", ("quality_$i.nii" for i in 1:4)...])
 for i in 1:length(fns), j in i+1:length(fns)
     @test niread(fns[i]).raw != niread(fns[j]).raw
 end
+
+GC.gc()
+rm(tmpdir, recursive=true)
 
 end
 
