@@ -164,9 +164,14 @@ unwrapping_main([phasefile_1eco, "-o", fn])
 @test isfile(fn)
 
 testpath = joinpath(tmpdir, "test_name_2")
-fn = joinpath(testpath, "unwrap_name.nii.gz")
-unwrapping_main([phasefile_1eco, "-o", fn])
-@test isfile(fn)
+gz_fn = joinpath(testpath, "unwrap_name.nii.gz")
+unwrapping_main([phasefile_1eco, "-o", gz_fn])
+@test isfile(gz_fn)
+
+## test .gz input file
+unwrapping_main([gz_fn, "-o", joinpath(testpath, "gz_read_test.nii")])
+unwrapping_main([gz_fn, "-m", gz_fn, "-o", joinpath(testpath, "gz_read_test.nii")])
+
 
 ## test mcpc3ds output files
 testpath = joinpath(tmpdir, "test5d")

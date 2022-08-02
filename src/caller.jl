@@ -66,7 +66,7 @@ function load_data_and_resolve_args!(settings)
     end
 
     settings["mmap-phase"] = !settings["no-mmap"] && !endswith(settings["phase"], ".gz")
-    settings["mmap-mag"] = !settings["no-mmap"] && (isnothing(settings["magnitude"]) || endswith(settings["magnitude"], ".gz"))
+    settings["mmap-mag"] = !settings["no-mmap"] && (isnothing(settings["magnitude"]) || !endswith(settings["magnitude"], ".gz"))
 
     data = Dict{String, AbstractArray}()
     data["phase"] = readphase(settings["phase"], mmap=settings["mmap-phase"], rescale=!settings["no-rescale"])
