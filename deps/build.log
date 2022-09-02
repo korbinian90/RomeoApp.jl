@@ -1,0 +1,33 @@
+ERROR: LoadError: unsupported Julia version: 1.8.0-rc3
+Stacktrace:
+  [1] error(s::String)
+    @ Base .\error.jl:35
+  [2] create_command_env(m::Module, envpath::String; test_deps::Bool)
+    @ Comonicon.Builder C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\sysimg.jl:69
+  [3] install_project_env(m::Module, options::Comonicon.Configs.Comonicon)
+    @ Comonicon.Builder C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\install.jl:27
+  [4] install(m::Module, options::Comonicon.Configs.Comonicon)
+    @ Comonicon.Builder C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\install.jl:8
+  [5] (::Comonicon.Builder.var"#2#3"{Module, Comonicon.Configs.Comonicon})()
+    @ Comonicon.Builder C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\cli.jl:64
+  [6] with_logstate(f::Function, logstate::Any)
+    @ Base.CoreLogging .\logging.jl:511
+  [7] with_logger
+    @ .\logging.jl:623 [inlined]
+  [8] command_main(m::Module, options::Comonicon.Configs.Comonicon)
+    @ Comonicon.Builder C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\cli.jl:63
+  [9] #command_main#1
+    @ C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\cli.jl:49 [inlined]
+ [10] command_main
+    @ C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\builder\cli.jl:47 [inlined]
+ [11] #comonicon_install#3
+    @ C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\frontend\cast.jl:492 [inlined]
+ [12] comonicon_install()
+    @ RomeoApp C:\Users\korbi\.julia\packages\Comonicon\RerN0\src\frontend\cast.jl:492
+ [13] top-level scope
+    @ C:\Users\korbi\.julia\dev\RomeoApp\deps\build.jl:1
+ [14] include(fname::String)
+    @ Base.MainInclude .\client.jl:476
+ [15] top-level scope
+    @ none:5
+in expression starting at C:\Users\korbi\.julia\dev\RomeoApp\deps\build.jl:1

@@ -2,6 +2,10 @@ function unwrapping_main(args)
     version = "3.5.0"
 
     settings = getargs(args, version)
+    romeo_unwrapping(args, settings, version)
+end
+
+@main function romeo_unwrapping(args, settings, version)
     data = load_data_and_resolve_args!(settings)
 
     mkpath(settings["output"])    
