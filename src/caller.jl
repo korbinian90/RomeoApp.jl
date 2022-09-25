@@ -1,5 +1,5 @@
 function unwrapping_main(args)
-    version = "3.5.0"
+    version = "3.5.2"
 
     settings = getargs(args, version)
     data = load_data_and_resolve_args!(settings)
@@ -83,7 +83,7 @@ function load_data_and_resolve_args!(settings)
 
     # activate phase-offset-correction as default (monopolar)
     settings["multi-channel"] = size(data["phase"], 5) > 1
-    if (!isempty(settings["compute-B0"]) || settings["multi-channel"] || settings["phase-offset-correction"] == "on") && settings["phase-offset-correction"] != "bipolar"
+    if (!isempty(settings["compute-B0"]) || settings["multi-channel"] || settings["phase-offset-correction"] == "on") && settings["phase-offset-correction"] ∉ ["bipolar", "off"]
         settings["phase-offset-correction"] = "monopolar"
         settings["verbose"] && println("Phase offset correction with MCPC-3D-S set to monopolar")
     end
@@ -91,7 +91,10 @@ function load_data_and_resolve_args!(settings)
         settings["phase-offset-correction"] = "off"
         settings["verbose"] && println("Phase offset correction with MCPC-3D-S turned off (only one echo)")
     end
-    
+    if settings["phase-offset-correction"] == "default off"
+        settings["phase-offset-correction"] = "off"
+    end
+
     ## Echoes for unwrapping
     settings["echoes"] = try
         getechoes(settings, settings["neco"])

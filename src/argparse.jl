@@ -61,7 +61,7 @@ function getargs(args::AbstractVector, version)
                 Applies the MCPC3Ds method to perform phase offset
                 determination and removal (for multi-echo).
                 "bipolar" removes eddy current artefacts (requires >= 3 echoes)."""
-            default = "off"
+            default = "default off"
             nargs = '?'
             constant = "on"
         "--phase-offset-smoothing-sigma-mm"
