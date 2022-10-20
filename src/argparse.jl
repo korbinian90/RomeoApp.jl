@@ -217,7 +217,7 @@ function saveconfiguration(writedir, settings, args, version)
     writedir = abspath(writedir)
     open(joinpath(writedir, "settings_romeo.txt"), "w") do io
         for (fname, val) in settings
-            if !(typeof(val) <: AbstractArray)
+            if !(val isa AbstractArray || fname == "header")
                 println(io, "$fname: " * string(val))
             end
         end
