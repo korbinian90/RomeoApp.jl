@@ -1,5 +1,5 @@
 function unwrapping_main(args)
-    version = "3.5.2"
+    version = "3.6.1"
 
     settings = getargs(args, version)
     data = load_data_and_resolve_args!(settings)
