@@ -140,7 +140,8 @@ function phase_offset_correction!(settings, data)
     po = zeros(eltype(data["phase"]), (size(data["phase"])[1:3]...,size(data["phase"],5)))
     sigma_mm = get_phase_offset_smoothing_sigma(settings)
     sigma_vox = sigma_mm ./ header(data["phase"]).pixdim[2:4]
-    mag = if haskey(settings, "mag") settings["mag"] else ones(size(data["phase"])) end
+    
+    mag = if haskey(data, "mag") data["mag"] else ones(size(data["phase"])) end
     phase, mcomb = mcpc3ds(data["phase"], mag; TEs, po, bipolar_correction, sigma=sigma_vox)
     data["phase"] = phase
     
