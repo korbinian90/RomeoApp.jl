@@ -7,9 +7,9 @@ using ROMEO
 include("argparse.jl")
 include("caller.jl")
 
-function julia_main()::Cint
+function julia_main(version)::Cint
     try
-        unwrapping_main(ARGS)
+        unwrapping_main(ARGS; version)
     catch
         Base.invokelatest(Base.display_error, Base.catch_stack())
         return 1

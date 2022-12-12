@@ -1,6 +1,4 @@
-function unwrapping_main(args)
-    version = "3.6.1"
-
+function unwrapping_main(args; version="App 3.6")
     settings = getargs(args, version)
     data = load_data_and_resolve_args!(settings)
 
