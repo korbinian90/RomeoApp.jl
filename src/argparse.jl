@@ -21,7 +21,7 @@ function getargs(args::AbstractVector, version)
             help = "The output path or filename"
             default = "unwrapped.nii"
         "--echo-times", "-t"
-            help = """The echo times required for temporal unwrapping 
+            help = """The echo times in [ms] required for temporal unwrapping 
                 specified in array or range syntax (eg. "[1.5,3.0]" or 
                 "3.5:3.5:14"). For identical echo times, "-t epi" can be
                 used with the possibility to specify the echo time as
