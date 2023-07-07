@@ -2,8 +2,10 @@
 
 p = joinpath("data", "small")
 phasefile_me = joinpath(p, "Phase.nii")
+phasefile_2D = joinpath(p, "Phase2D.nii")
 phasefile_me_nan = joinpath(p, "phase_with_nan.nii")
 magfile_me = joinpath(p, "Mag.nii")
+magfile_2D = joinpath(p, "Mag2D.nii")
 tmpdir = mktempdir()
 phasefile_1eco = joinpath(tmpdir, "Phase.nii")
 magfile_1eco = joinpath(tmpdir, "Mag.nii")
@@ -15,6 +17,8 @@ savenii(niread(phasefile_me)[:,:,:,1], phasefile_1eco)
 savenii(niread(magfile_me)[:,:,:,1], magfile_1eco)
 savenii(niread(phasefile_me)[:,:,:,[1]], phasefile_1arreco)
 savenii(niread(magfile_me)[:,:,:,[1]], magfile_1arreco)
+savenii(niread(phasefile_me)[:,:,1,1], phasefile_2D)
+savenii(niread(magfile_me)[:,:,1,1], magfile_2D)
 
 phasefile_me_5D = joinpath(tmpdir, "phase_multi_channel.nii")
 magfile_5D = joinpath(tmpdir, "mag_multi_channel.nii")
@@ -43,7 +47,7 @@ configurations_se(pm) = [
     [pm..., "-i"],
     [pm..., "-q"],
     [pm..., "-Q"],
-    [pm..., "-m", magfile_me, "-u"],
+    [pm..., "-u"],
     [pm..., "-w", "romeo"],
     [pm..., "-w", "bestpath"],
     [pm..., "-w", "1010"],
@@ -57,7 +61,6 @@ configurations_se(pm) = [
     [pm..., "-k", "nomask"],
     [pm..., "-k", "qualitymask"],
     [pm..., "-k", "qualitymask", "0.1"],
-    [pm..., "-k", maskfile],
 ]
 configurations_me(phasefile_me, magfile_me) = vcat(configurations_me.([[phasefile_me], [phasefile_me, "-m", magfile_me]])...)
 configurations_me(pm) = [
@@ -80,7 +83,7 @@ configurations_me(pm) = [
     [pm..., "--phase-offset-correction", "-t", "[2,4,6]", "--write-phase-offsets"],
 ]
 
-files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]
+files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco), (phasefile_2D, magfile_2D)]
 for (pf, mf) in files, args in configurations_se(pf, mf)
     test_romeo(args)
 end
@@ -134,6 +137,9 @@ m = "The echo times 1 and 2 ([1.1, 1.1, 1.1]) need to be different for MCPC-3D-S
 @test_logs (:warn, m) match_mode=:any unwrapping_main(["-p", phasefile_me, "-m", magfile_me, "-o", tmpdir, "-t", "[1.1, 1.1, 1.1]", "--phase-offset-correction"])
 
 @test_logs unwrapping_main(["-p", phasefile_1eco, "-o", tmpdir, "-m", magfile_1eco]) # test that no warning appears
+
+## test maskfile
+unwrapping_main([phasefile_se, "-k", maskfile])
 
 ## test no-rescale
 readphase = RomeoApp.readphase

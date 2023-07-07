@@ -75,9 +75,7 @@ function load_data_and_resolve_args!(settings)
     end
     
     settings["header"] = header(data["phase"])
-    settings["size"] = size(data["phase"])[1:3]
     settings["neco"] = size(data["phase"], 4)
-    settings["nchannels"] = size(data["phase"], 5)
 
     # activate phase-offset-correction as default (monopolar)
     settings["multi-channel"] = size(data["phase"], 5) > 1
@@ -112,7 +110,7 @@ function load_data_and_resolve_args!(settings)
         error("Number of chosen echoes is $(length(settings["echoes"])) ($(settings["neco"]) in .nii data), but $(length(settings["TEs"])) TEs were specified!")
     end
     
-    if haskey(data, "mag") && (size(data["mag"])[1:3] != size(data["phase"])[1:3] || size(data["mag"], 4) < maximum(settings["echoes"]))
+    if haskey(data, "mag") && (size.(Ref(data["mag"]), 1:3) != size.(Ref(data["phase"]), 1:3) || size(data["mag"], 4) < maximum(settings["echoes"]))
         error("size of magnitude and phase does not match!")
     end
 
