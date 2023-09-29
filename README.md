@@ -1,8 +1,7 @@
-# RomeoApp
-[![Build Status](https://github.com/korbinian90/RomeoApp.jl/workflows/CI/badge.svg)](https://github.com/korbinian90/RomeoApp.jl/actions)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/korbinian90/RomeoApp.jl?svg=true)](https://ci.appveyor.com/project/korbinian90/RomeoApp-jl)
-[![Codecov](https://codecov.io/gh/korbinian90/RomeoApp.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/RomeoApp.jl)
+# RomeoApp [deprecated]
+The functionality has moved to [ROMEO.jl as an extension](https://github.com/korbinian90/ROMEO.jl#usage---command-line).
 
+---------------
 Easy way to apply ROMEO unwrapping in the command line without Julia programming experience. This repository is a wrapper of [ROMEO.jl](https://github.com/korbinian90/ROMEO.jl).
 
 Another possibility without requiring a Julia installation is the compiled version under [ROMEO](https://github.com/korbinian90/ROMEO).
