@@ -1,6 +1,9 @@
 # RomeoApp [deprecated]
 The functionality has moved to [ROMEO.jl as an extension](https://github.com/korbinian90/ROMEO.jl#usage---command-line).
 
+New usage explanation:
+https://github.com/korbinian90/ROMEO.jl#usage---command-line
+
 ---------------
 Easy way to apply ROMEO unwrapping in the command line without Julia programming experience. This repository is a wrapper of [ROMEO.jl](https://github.com/korbinian90/ROMEO.jl).
 
